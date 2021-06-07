@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MediaPlayer</string>
+    <string name="track_list_title">Track list</string>
 </resources>
