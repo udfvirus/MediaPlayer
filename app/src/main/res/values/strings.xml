@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MediaPlayer</string>
     <string name="track_list_title">Track list</string>
+
+    <string name="permission_denied">Permission request was denied.</string>
+    <string name="permission_not_available">Permission is not available. Requesting read external storage permission.</string>
+
+    <string name="ok">OK</string>
 </resources>

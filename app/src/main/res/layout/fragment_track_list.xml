@@ -16,14 +16,4 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/view_track_item" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addTrackButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:src="@drawable/ic_baseline_add_24"
-        app:layout_constraintBottom_toBottomOf="@+id/trackRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

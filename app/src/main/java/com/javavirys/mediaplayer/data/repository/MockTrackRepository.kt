@@ -5,7 +5,7 @@ import com.javavirys.mediaplayer.core.entity.ResourceTrack
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.domain.repository.TrackRepository
 
-class LocalTrackRepository : TrackRepository {
+class MockTrackRepository : TrackRepository {
 
     private val tracks = mutableListOf(
         ResourceTrack("Sound 1", R.raw.track_one)

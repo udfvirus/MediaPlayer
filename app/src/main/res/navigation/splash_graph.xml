@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/splash_graph"
+    app:startDestination="@id/splashActivity">
+
+    <activity
+        android:id="@+id/splashActivity"
+        android:name="com.javavirys.mediaplayer.presentation.screen.SplashActivity"
+        android:label="SplashActivity"
+        tools:layout="@layout/activity_splash" />
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.javavirys.mediaplayer.presentation.screen.MainActivity"
+        android:label="MainActivity"
+        tools:layout="@layout/activity_main" />
+
+</navigation>
