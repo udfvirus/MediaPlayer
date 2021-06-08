@@ -6,12 +6,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.di.viewmodel.TrackListViewModelFactory
 import com.javavirys.mediaplayer.presentation.adapter.TrackAdapter
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
 import com.javavirys.mediaplayer.util.extension.findView
+
 
 class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
@@ -21,13 +21,10 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
     private lateinit var trackRecyclerView: RecyclerView
 
-    private lateinit var addTrackButton: FloatingActionButton
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initToolbar()
         initRecyclerView(view)
-        initFloatingActionButton(view)
     }
 
     private fun initToolbar() {
@@ -44,12 +41,5 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
                 adapter.items = it
                 adapter.notifyDataSetChanged()
             }
-    }
-
-    private fun initFloatingActionButton(view: View) {
-        addTrackButton = view.findView(R.id.addTrackButton)
-        addTrackButton.setOnClickListener {
-            model.navigateToAddTrackScreen()
-        }
     }
 }
