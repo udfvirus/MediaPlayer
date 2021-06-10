@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -13,14 +12,14 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.javavirys.mediaplayer.R
-import com.javavirys.mediaplayer.di.viewmodel.SplashViewModelFactory
 import com.javavirys.mediaplayer.presentation.viewmodel.SplashViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import com.javavirys.mediaplayer.util.extension.showSnackbar
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
 
-    private val model: SplashViewModel by viewModels { SplashViewModelFactory(this) }
+    private val model: SplashViewModel by viewModel()
 
     private val splashConstraintLayout by lazy { findView<ConstraintLayout>(R.id.splashConstraintLayout) }
 

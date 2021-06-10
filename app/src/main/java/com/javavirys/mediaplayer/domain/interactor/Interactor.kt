@@ -1,6 +1,6 @@
 package com.javavirys.mediaplayer.domain.interactor
 
-interface Interactor {
+interface Interactor<P, R> {
 
-    fun invoke()
+    suspend fun execute(param: P): R
 }

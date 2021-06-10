@@ -1,5 +1,5 @@
 package com.javavirys.mediaplayer.presentation.navigation
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 
-class MainRouter(private val activity: AppCompatActivity)
+class MainRouter(private val context: Context)

@@ -4,6 +4,8 @@ import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.ResourceTrack
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.domain.repository.TrackRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class MockTrackRepository : TrackRepository {
 
@@ -13,7 +15,11 @@ class MockTrackRepository : TrackRepository {
 
     override suspend fun getTrack(position: Int) = tracks[position]
 
-    override suspend fun getAllTracks(): List<Track> = tracks
+    override suspend fun getAllTracks(): Flow<Track> = flow {
+        tracks.forEach {
+            emit(it)
+        }
+    }
 
     override suspend fun getTrackCount() = tracks.size
 

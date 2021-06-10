@@ -9,7 +9,7 @@ import com.javavirys.mediaplayer.util.extension.inflate
 class TrackAdapter(private val onItemClick: (item: Track) -> Unit) :
     RecyclerView.Adapter<TrackViewHolder>() {
 
-    var items: List<Track>? = null
+    private val items = mutableListOf<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TrackViewHolder(
         parent.inflate(R.layout.view_track_item),
@@ -17,10 +17,13 @@ class TrackAdapter(private val onItemClick: (item: Track) -> Unit) :
     )
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        items?.let {
-            holder.bind(it[position])
-        }
+        holder.bind(items[position])
     }
 
-    override fun getItemCount() = items?.size ?: 0
+    override fun getItemCount() = items.size
+
+    fun addItem(track: Track) {
+        items.add(track)
+        notifyItemInserted(items.size - 1)
+    }
 }
