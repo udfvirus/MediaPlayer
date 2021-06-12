@@ -1,7 +1,7 @@
 package com.javavirys.mediaplayer.core.entity
 
-import androidx.work.WorkRequest
+import androidx.work.OneTimeWorkRequest
 
 data class Worker(
-    val workRequest: WorkRequest
+    val workRequest: OneTimeWorkRequest
 )

@@ -9,6 +9,20 @@
         android:id="@+id/trackListFragment"
         android:name="com.javavirys.mediaplayer.presentation.screen.TrackListFragment"
         android:label="TrackListFragment"
-        tools:layout="@layout/fragment_track_list"/>
+        tools:layout="@layout/fragment_track_list">
+        <action
+            android:id="@+id/action_trackListFragment_to_trackFragment"
+            app:destination="@id/trackFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/trackFragment"
+        android:name="com.javavirys.mediaplayer.presentation.screen.TrackFragment"
+        android:label="TrackFragment"
+        tools:layout="@layout/fragment_track">
+        <argument
+            android:name="trackId"
+            app:argType="long" />
+    </fragment>
 
 </navigation>

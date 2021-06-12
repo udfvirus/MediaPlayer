@@ -15,6 +15,8 @@ class MediaPlayerApplication : Application() {
             androidContext(this@MediaPlayerApplication)
             modules(
                 listOf(
+                    appModule,
+                    mediaModule,
                     databaseModule,
                     repositoryModule,
                     interactorModule,

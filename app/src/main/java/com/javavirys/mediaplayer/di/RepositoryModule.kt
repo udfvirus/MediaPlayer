@@ -8,5 +8,5 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
     single<TrackRepository> { LocalTrackRepository(get()) }
-    single<WorkerRepository> { LocalWorkerRepository(get()) }
+    single<WorkerRepository> { LocalWorkerRepository(get(), get()) }
 }

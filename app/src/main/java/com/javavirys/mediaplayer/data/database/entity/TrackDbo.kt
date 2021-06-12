@@ -12,7 +12,7 @@ import com.javavirys.mediaplayer.data.database.entity.TrackDbo.Companion.TABLE_N
     indices = [Index(value = [COLUMN_FILE_NAME], unique = true)]
 )
 data class TrackDbo(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
     @ColumnInfo(name = COLUMN_FILE_NAME) val filePath: String,
     val name: String,
     val favorite: Boolean = false,
