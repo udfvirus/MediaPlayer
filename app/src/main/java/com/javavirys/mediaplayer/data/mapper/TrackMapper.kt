@@ -6,5 +6,7 @@ import com.javavirys.mediaplayer.data.database.entity.TrackDbo
 
 class TrackMapper {
 
-    fun toTrack(trackDbo: TrackDbo): Track = FileSystemTrack(trackDbo.name, trackDbo.filePath)
+    fun toTrack(trackDbo: TrackDbo): Track {
+        return FileSystemTrack(trackDbo.id, trackDbo.name, trackDbo.filePath)
+    }
 }

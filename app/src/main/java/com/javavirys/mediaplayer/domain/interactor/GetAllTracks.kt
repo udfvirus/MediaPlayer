@@ -9,7 +9,5 @@ class GetAllTracks(
     private val trackRepository: TrackRepository
 ) : InteractorWithoutParam<Flow<Track>>() {
 
-    override suspend fun execute(): Flow<Track> {
-        return trackRepository.getAllTracks()
-    }
+    override suspend fun execute() = trackRepository.getAllTracks()
 }

@@ -6,7 +6,9 @@ import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.util.extension.inflate
 
-class TrackAdapter(private val onItemClick: (item: Track) -> Unit) :
+class TrackAdapter(
+    private val onItemClick: (item: Track) -> Unit
+) :
     RecyclerView.Adapter<TrackViewHolder>() {
 
     private val items = mutableListOf<Track>()
@@ -23,7 +25,10 @@ class TrackAdapter(private val onItemClick: (item: Track) -> Unit) :
     override fun getItemCount() = items.size
 
     fun addItem(track: Track) {
-        items.add(track)
-        notifyItemInserted(items.size - 1)
+        val foundItem = items.find { track.id == it.id }
+        if (foundItem == null) {
+            items.add(track)
+            notifyItemInserted(items.lastIndex)
+        }
     }
 }

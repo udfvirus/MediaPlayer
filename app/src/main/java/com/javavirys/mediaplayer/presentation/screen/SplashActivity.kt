@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -26,16 +26,20 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
     private val logoImageView by lazy { findView<ImageView>(R.id.logoImageView) }
 
     private val requestPermissionLauncher =
-        registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                model.navigateToMainScreen()
-            } else {
-                splashConstraintLayout.showSnackbar(
-                    R.string.permission_denied,
-                    Snackbar.LENGTH_SHORT,
-                    R.string.ok
-                )
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            it.values.forEach { isGranted ->
+                if (!isGranted) {
+                    splashConstraintLayout.showSnackbar(
+                        R.string.permission_denied,
+                        Snackbar.LENGTH_INDEFINITE,
+                        R.string.ok
+                    ) {
+                        navigateToMainScreen()
+                    }
+                    return@registerForActivityResult
+                }
             }
+            model.navigateToMainScreen()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +52,9 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             model.navigateToMainScreen()
@@ -60,16 +67,29 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
+            ) && ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.RECORD_AUDIO
             )
         ) {
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
         } else {
             splashConstraintLayout.showSnackbar(
                 R.string.permission_not_available,
-                Snackbar.LENGTH_LONG,
+                Snackbar.LENGTH_INDEFINITE,
                 R.string.ok
             ) {
-                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                requestPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                )
             }
         }
     }

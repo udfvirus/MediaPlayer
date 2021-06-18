@@ -30,7 +30,7 @@ fun View.showSnackbar(
     msg: String,
     length: Int,
     actionMessage: CharSequence?,
-    action: (View) -> Unit
+    action: (View) -> Unit = {}
 ) {
     val snackbar = Snackbar.make(this, msg, length)
     if (actionMessage != null) {

@@ -16,9 +16,42 @@ class FileScannerWorker(context: Context, workerParams: WorkerParameters) :
     private val trackDao = DatabaseFactory.getDatabaseInstance(applicationContext)
         .getTrackDao()
 
-    override suspend fun doWork() = withContext(Dispatchers.Default) {
-        scanDirectories(Environment.getExternalStorageDirectory().path)
-        Result.success()
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        println("test1: doWork")
+//        async {
+//            println("test1: count = " + trackDao.getTracksCount())
+//            trackDao.getAllTracks().collect { track: TrackDbo? ->
+//                println("test1: getAllTracks.track = $track")
+//                if (track != null) {
+//                    println("test1: getAllTracks.id = " + track?.id)
+//                    println("test1: getAllTracks.name = " + track?.name)
+//                }
+//            }
+//        }
+//
+//        try {
+//            println("test1: track == ")
+//            println("test1: track path = " + Environment.getExternalStorageDirectory().path)
+//            scanDirectories(Environment.getExternalStorageDirectory().path)
+//        } catch (exception: Exception) {
+//            exception.printStackTrace()
+//            println("test1: doWork exception = $exception")
+//        }
+//        println("test1: success")
+//        Result.success()
+        return@withContext try {
+//           async {
+//                println("test1: count = " + trackDao.getTracksCount())
+//                trackDao.getAllTracks().collect {
+//                    println("test1: track.id = " + it.id)
+//                    println("test1: track.name = " + it.name)
+//                }
+//            }
+            scanDirectories(Environment.getExternalStorageDirectory().path)
+            Result.success()
+        } catch (error: Throwable) {
+            Result.failure()
+        }
     }
 
     private suspend fun scanDirectories(path: String) {
@@ -43,7 +76,15 @@ class FileScannerWorker(context: Context, workerParams: WorkerParameters) :
     private suspend fun processFile(file: File) {
         when (file.extension) {
             "mp3" -> {
-                trackDao.insert(TrackDbo(0, file.path, file.nameWithoutExtension))
+                println("test: processFile.audio = ${file.nameWithoutExtension}")
+                try {
+                    val id = trackDao.insert(TrackDbo(0, file.path, file.nameWithoutExtension))
+                    println("test: processFile.id = $id")
+                    println("test: processFile.count = " + trackDao.getTracksCount())
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
+                    println("test: processFile exception = $exception")
+                }
             }
         }
     }
