@@ -15,7 +15,7 @@ class MediaService(private val mediaPlayer: MediaPlayer) {
         mediaPlayer.prepare()
         mediaPlayer.start()
 
-        return TrackInformation(mediaPlayer.audioSessionId, mediaPlayer.duration)
+        return TrackInformation(mediaPlayer.audioSessionId, mediaPlayer.duration, track)
     }
 
     fun stop() {
