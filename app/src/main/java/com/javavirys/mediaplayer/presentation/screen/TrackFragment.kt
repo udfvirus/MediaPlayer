@@ -31,9 +31,10 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
     private lateinit var progress: LinearProgressIndicator
 
+    private val toolbar by lazy { requireActivity().findView<Toolbar>(R.id.toolbar) }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initToolbar()
 
         visualizer = view.findView(R.id.visualizer)
 
@@ -66,6 +67,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                 is PlayerStatus.INITIALIZED -> {
                     visualizer.setPlayer(it.trackInformation.audioSessionId)
                     progress.max = it.trackInformation.duration
+                    toolbar.title = it.trackInformation.track.name
                 }
                 is PlayerStatus.PLAYED -> {
                     Glide.with(this)
@@ -91,10 +93,5 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onDestroyView() {
         model.stopTrack()
         super.onDestroyView()
-    }
-
-    private fun initToolbar() {
-        val toolbar = requireActivity().findView<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.track_list_title)
     }
 }

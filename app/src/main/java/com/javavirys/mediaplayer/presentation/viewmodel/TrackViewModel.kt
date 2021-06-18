@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.javavirys.mediaplayer.core.entity.PlayerStatus
 import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.core.entity.TrackInformation
 import com.javavirys.mediaplayer.domain.interactor.GetNextTrack
 import com.javavirys.mediaplayer.domain.interactor.GetPreviousTrack
 import com.javavirys.mediaplayer.domain.interactor.GetTrack
@@ -32,13 +33,7 @@ class TrackViewModel(
                 track = getTrack.execute(trackId)
                 playTrack.execute(track!!)
             },
-            foregroundCode = {
-                _playerLiveData.value = PlayerStatus.INITIALIZED(it)
-                _playerLiveData.value = PlayerStatus.PLAYED(Unit)
-            },
-            catchCode = {
-                it.printStackTrace()
-            }
+            foregroundCode = ::changeStatusToPlayed
         )
         return playerLiveData
     }
@@ -93,7 +88,8 @@ class TrackViewModel(
                 backgroundCode = {
                     track = getNextTrack.execute(it)
                     playTrack.execute(track!!)
-                }
+                },
+                foregroundCode = ::changeStatusToPlayed
             )
         }
     }
@@ -104,8 +100,14 @@ class TrackViewModel(
                 backgroundCode = {
                     track = getPreviousTrack.execute(it)
                     playTrack.execute(track!!)
-                }
+                },
+                foregroundCode = ::changeStatusToPlayed
             )
         }
+    }
+
+    private fun changeStatusToPlayed(trackInformation: TrackInformation) {
+        _playerLiveData.value = PlayerStatus.INITIALIZED(trackInformation)
+        _playerLiveData.value = PlayerStatus.PLAYED(Unit)
     }
 }
