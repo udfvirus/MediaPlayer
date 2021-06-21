@@ -9,6 +9,8 @@ interface TrackRepository {
 
     suspend fun getAllTracks(): Flow<Track>
 
+    suspend fun getTrackList(): List<Track>
+
     suspend fun getTrackCount(): Int
 
     suspend fun addTrack(track: Track)

@@ -3,7 +3,6 @@ package com.javavirys.mediaplayer.presentation.screen
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.Result
@@ -12,9 +11,9 @@ import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class TrackListFragment : Fragment(R.layout.fragment_track_list) {
+class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_track_list) {
 
-    private val model: TrackListViewModel by viewModel()
+    override val model: TrackListViewModel by viewModel()
 
     private val adapter by lazy {
         TrackAdapter {

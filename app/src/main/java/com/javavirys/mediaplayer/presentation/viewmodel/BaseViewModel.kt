@@ -1,5 +1,7 @@
 package com.javavirys.mediaplayer.presentation.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,10 +13,14 @@ import kotlinx.coroutines.withContext
 
 abstract class BaseViewModel : ViewModel() {
 
+    private val exceptionLiveData = MutableLiveData<Throwable>()
+
+    fun getExceptions(): LiveData<Throwable> = exceptionLiveData
+
     protected fun <R> subscribeOnFlow(
         backgroundCode: suspend () -> Flow<R>,
         foregroundCode: (result: R) -> Unit,
-        catchCode: (throwable: Throwable) -> Unit = {},
+        catchCode: (throwable: Throwable) -> Unit = ::onException,
         backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,
         foregroundDispatcher: CoroutineDispatcher = Dispatchers.Main
     ) {
@@ -37,7 +43,7 @@ abstract class BaseViewModel : ViewModel() {
     protected fun <R> launch(
         backgroundCode: suspend () -> R,
         foregroundCode: (result: R) -> Unit = {},
-        catchCode: (throwable: Throwable) -> Unit = {},
+        catchCode: (throwable: Throwable) -> Unit = ::onException,
         backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,
         foregroundDispatcher: CoroutineDispatcher = Dispatchers.Main
     ) {
@@ -53,5 +59,10 @@ abstract class BaseViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    protected open fun onException(throwable: Throwable) {
+        throwable.printStackTrace()
+        exceptionLiveData.value = throwable
     }
 }

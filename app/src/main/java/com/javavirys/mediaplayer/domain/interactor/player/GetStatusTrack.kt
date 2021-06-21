@@ -1,6 +1,5 @@
 package com.javavirys.mediaplayer.domain.interactor.player
 
-import com.javavirys.mediaplayer.core.entity.PlayerStatus
 import com.javavirys.mediaplayer.data.service.MediaService
 import com.javavirys.mediaplayer.domain.interactor.additional.InteractorWithoutParam
 import kotlinx.coroutines.delay
@@ -9,13 +8,16 @@ import kotlinx.coroutines.flow.flow
 
 class GetStatusTrack(
     private val mediaService: MediaService
-) : InteractorWithoutParam<Flow<PlayerStatus>>() {
+) : InteractorWithoutParam<Flow<Int>>() {
 
-    override suspend fun execute(): Flow<PlayerStatus> = flow {
+    override suspend fun execute(): Flow<Int> = flow {
         while (mediaService.isPlaying()) {
-            emit(PlayerStatus.PROGRESS(mediaService.getPosition()))
-            delay(800)
+            emit(mediaService.getPosition())
+            delay(DELAY_FOR_GET_POSITION)
         }
-        emit(PlayerStatus.PAUSED(Unit))
+    }
+
+    companion object {
+        private const val DELAY_FOR_GET_POSITION = 800L
     }
 }

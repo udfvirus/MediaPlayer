@@ -7,5 +7,10 @@ class GetPreviousTrack(
     private val trackRepository: TrackRepository
 ) : Interactor<Track, Track> {
 
-    override suspend fun execute(param: Track) = trackRepository.getPreviousTrack(param)
+    override suspend fun execute(param: Track): Track {
+        val tracks = trackRepository.getTrackList()
+        val currentIndex = tracks.indexOfFirst { it.id == param.id }
+
+        return tracks[currentIndex - 1]
+    }
 }

@@ -23,28 +23,40 @@ class TrackViewModel(
 
     private val _playerLiveData = MutableLiveData<PlayerStatus>()
 
-    private var track: Track? = null
+    private val _trackInformationLiveData = MutableLiveData<Int>()
+
+    private var trackInformation: TrackInformation? = null
+
+    private var trackId = 0L
 
     val playerLiveData: LiveData<PlayerStatus> = _playerLiveData
 
-    fun play(trackId: Long): LiveData<PlayerStatus> {
-        launch(
-            backgroundCode = {
-                track = getTrack.execute(trackId)
-                playTrack.execute(track!!)
-            },
-            foregroundCode = ::changeStatusToPlayed
-        )
-        return playerLiveData
+    val trackInformationLiveData: LiveData<Int> = _trackInformationLiveData
+
+    fun setTrackId(trackId: Long) {
+        this.trackId = trackId
     }
 
-    fun updateTimePosition() {
+    fun play() {
+        launch(
+            backgroundCode = {
+                val track = getTrack.execute(trackId)
+                playTrack.execute(track)
+            },
+            foregroundCode = {
+                changeStatusToPlayed(it)
+                updateTimePosition()
+            }
+        )
+    }
+
+    private fun updateTimePosition() {
         subscribeOnFlow(
             backgroundCode = {
                 getStatusTrack.execute(Unit)
             },
             foregroundCode = {
-                _playerLiveData.value = it
+                _trackInformationLiveData.value = it
             }
         )
     }
@@ -55,7 +67,9 @@ class TrackViewModel(
                 resumeTrack.execute(Unit)
             },
             foregroundCode = {
-                _playerLiveData.value = PlayerStatus.PLAYED(Unit)
+                trackInformation?.let {
+                    _playerLiveData.value = PlayerStatus.Played(it)
+                }
             }
         )
     }
@@ -66,7 +80,7 @@ class TrackViewModel(
                 pauseTrack.execute(Unit)
             },
             foregroundCode = {
-                _playerLiveData.value = PlayerStatus.PAUSED(Unit)
+                _playerLiveData.value = PlayerStatus.Paused(Unit)
             }
         )
     }
@@ -77,37 +91,54 @@ class TrackViewModel(
                 stopTrack.execute(Unit)
             },
             foregroundCode = {
-                _playerLiveData.value = PlayerStatus.PAUSED(Unit)
+                _playerLiveData.value = PlayerStatus.Paused(Unit)
             }
         )
     }
 
     fun nextTrack() {
-        track?.let {
-            launch(
-                backgroundCode = {
-                    track = getNextTrack.execute(it)
-                    playTrack.execute(track!!)
-                },
-                foregroundCode = ::changeStatusToPlayed
-            )
+        gotoTrack {
+            getNextTrack.execute(it)
         }
     }
 
     fun previousTrack() {
-        track?.let {
+        gotoTrack {
+            getPreviousTrack.execute(it)
+        }
+    }
+
+    private fun gotoTrack(getTrackFunction: suspend (Track) -> Track) {
+        trackInformation?.let {
+            _playerLiveData.value = PlayerStatus.NotReady(Unit)
             launch(
                 backgroundCode = {
-                    track = getPreviousTrack.execute(it)
-                    playTrack.execute(track!!)
+                    val track = getTrackFunction(it.track)
+                    playTrack.execute(track)
                 },
-                foregroundCode = ::changeStatusToPlayed
+                foregroundCode = {
+                    trackInformation = it
+                    _playerLiveData.value = PlayerStatus.Played(it)
+                    updateTimePosition()
+                }
             )
         }
     }
 
     private fun changeStatusToPlayed(trackInformation: TrackInformation) {
-        _playerLiveData.value = PlayerStatus.INITIALIZED(trackInformation)
-        _playerLiveData.value = PlayerStatus.PLAYED(Unit)
+        this.trackInformation = trackInformation
+        _playerLiveData.value = PlayerStatus.Initialized(trackInformation)
+        _playerLiveData.value = PlayerStatus.Played(trackInformation)
+    }
+
+    override fun onException(throwable: Throwable) {
+        if (throwable !is ArrayIndexOutOfBoundsException) {
+            super.onException(throwable)
+        }
+    }
+
+    override fun onCleared() {
+        _playerLiveData.value = PlayerStatus.Released(Unit)
+        super.onCleared()
     }
 }

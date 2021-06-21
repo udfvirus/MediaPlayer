@@ -4,10 +4,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
-import com.chibde.visualizer.CircleBarVisualizer
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayerStatus
@@ -15,13 +14,13 @@ import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class TrackFragment : Fragment(R.layout.fragment_track) {
+class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
 
     private val args: TrackFragmentArgs by navArgs()
 
-    private val model: TrackViewModel by viewModel()
+    override val model: TrackViewModel by viewModel()
 
-    private lateinit var visualizer: CircleBarVisualizer
+    private lateinit var visualizer: LottieAnimationView
 
     private lateinit var playImageView: ImageView
 
@@ -32,6 +31,16 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     private lateinit var progress: LinearProgressIndicator
 
     private val toolbar by lazy { requireActivity().findView<Toolbar>(R.id.toolbar) }
+
+    private var trackId = 0L
+
+    private var audioSessionId: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        trackId = savedInstanceState?.getLong(TRACK_ID_KEY, args.trackId) ?: args.trackId
+        model.setTrackId(trackId)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,7 +56,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         prevImageView = view.findView(R.id.prevImageView)
 
         playImageView.setOnClickListener {
-            if (model.playerLiveData.value is PlayerStatus.PAUSED) {
+            if (model.playerLiveData.value is PlayerStatus.Paused) {
                 model.resumeTrack()
             } else {
                 model.pauseTrack()
@@ -55,34 +64,50 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         }
 
         nextImageView.setOnClickListener {
-            model.nextTrack()
+            if (model.playerLiveData.value !is PlayerStatus.NotReady) {
+                model.nextTrack()
+            }
         }
 
         prevImageView.setOnClickListener {
-            model.previousTrack()
+            if (model.playerLiveData.value !is PlayerStatus.NotReady) {
+                model.previousTrack()
+            }
         }
 
         model.playerLiveData.observe(viewLifecycleOwner) {
             when (it) {
-                is PlayerStatus.INITIALIZED -> {
-                    visualizer.setPlayer(it.trackInformation.audioSessionId)
+                is PlayerStatus.Initialized -> {
+                }
+                is PlayerStatus.Played -> {
+                    visualizer.resumeAnimation()
+                    trackId = it.trackInformation.track.id
                     progress.max = it.trackInformation.duration
                     toolbar.title = it.trackInformation.track.name
-                }
-                is PlayerStatus.PLAYED -> {
+
                     Glide.with(this)
-                        .load(R.drawable.ic_baseline_stop_circle_24).into(playImageView)
-                    model.updateTimePosition()
+                        .load(R.drawable.ic_baseline_stop_circle_24)
+                        .into(playImageView)
                 }
-                is PlayerStatus.PAUSED -> Glide.with(this)
-                    .load(R.drawable.ic_baseline_play_circle_24).into(playImageView)
-                is PlayerStatus.PROGRESS -> {
-                    progress.progress = it.time
+                is PlayerStatus.Paused -> {
+                    visualizer.pauseAnimation()
+                    Glide.with(this)
+                        .load(R.drawable.ic_baseline_play_circle_24)
+                        .into(playImageView)
+                }
+                is PlayerStatus.Released -> {
+                    Glide.with(this)
+                        .load(R.drawable.ic_baseline_play_circle_24)
+                        .into(playImageView)
                 }
             }
         }
 
-        model.play(args.trackId)
+        model.trackInformationLiveData.observe(viewLifecycleOwner) {
+            progress.progress = it
+        }
+
+        model.play()
     }
 
     override fun onStop() {
@@ -90,8 +115,17 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         model.pauseTrack()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(TRACK_ID_KEY, trackId)
+    }
+
     override fun onDestroyView() {
         model.stopTrack()
         super.onDestroyView()
+    }
+
+    companion object {
+        private const val TRACK_ID_KEY = "TRACK_ID_KEY"
     }
 }

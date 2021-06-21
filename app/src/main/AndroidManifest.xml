@@ -19,6 +19,7 @@
 
         <activity
             android:name=".presentation.screen.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MediaPlayer.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.screen.MainActivity" />
+        <activity
+            android:name=".presentation.screen.MainActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

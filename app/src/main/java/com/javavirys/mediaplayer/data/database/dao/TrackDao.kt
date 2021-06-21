@@ -16,6 +16,9 @@ interface TrackDao {
     @Query("SELECT * FROM ${TrackDbo.TABLE_NAME} ORDER BY name")
     fun getAllTracks(): Flow<List<TrackDbo>>
 
+    @Query("SELECT * FROM ${TrackDbo.TABLE_NAME} ORDER BY name")
+    suspend fun getTrackList(): List<TrackDbo>
+
     @Query("SELECT COUNT(*) FROM ${TrackDbo.TABLE_NAME}")
     suspend fun getTracksCount(): Int
 

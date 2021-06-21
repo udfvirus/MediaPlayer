@@ -1,8 +1,9 @@
 package com.javavirys.mediaplayer.core.entity
 
 sealed class PlayerStatus {
-    data class INITIALIZED(val trackInformation: TrackInformation) : PlayerStatus()
-    data class PLAYED(val unit: Unit) : PlayerStatus()
-    data class PAUSED(val unit: Unit) : PlayerStatus()
-    data class PROGRESS(val time: Int) : PlayerStatus()
+    data class NotReady(val unit: Unit) : PlayerStatus()
+    data class Initialized(val trackInformation: TrackInformation) : PlayerStatus()
+    data class Released(val unit: Unit) : PlayerStatus()
+    data class Played(val trackInformation: TrackInformation) : PlayerStatus()
+    data class Paused(val unit: Unit) : PlayerStatus()
 }
