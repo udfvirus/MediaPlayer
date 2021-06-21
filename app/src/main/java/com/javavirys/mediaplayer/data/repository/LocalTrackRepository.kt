@@ -27,6 +27,11 @@ class LocalTrackRepository(
         }
     }
 
+    override suspend fun getTrackList(): List<Track> {
+        return trackDao.getTrackList()
+            .map { TrackMapper().toTrack(it) }
+    }
+
     override suspend fun getTrackCount() = trackDao.getTracksCount()
 
     override suspend fun addTrack(track: Track) {

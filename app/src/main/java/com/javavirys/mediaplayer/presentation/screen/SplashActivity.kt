@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -17,9 +16,9 @@ import com.javavirys.mediaplayer.util.extension.findView
 import com.javavirys.mediaplayer.util.extension.showSnackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
+class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
 
-    private val model: SplashViewModel by viewModel()
+    override val model: SplashViewModel by viewModel()
 
     private val splashConstraintLayout by lazy { findView<ConstraintLayout>(R.id.splashConstraintLayout) }
 
