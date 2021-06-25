@@ -6,4 +6,8 @@
     <string name="permission_not_available">Permissions is not available. Request permission to read external storage and write sound (needed for audio visualization).</string>
 
     <string name="ok">OK</string>
+
+    <!-- Notificaiton Channel -->
+    <string name="notification_channel">Now Playing</string>
+    <string name="notification_channel_description">Shows what music is currently playing in UAMP</string>
 </resources>

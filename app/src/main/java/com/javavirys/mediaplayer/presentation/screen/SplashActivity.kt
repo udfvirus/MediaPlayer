@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.Manifest
@@ -51,9 +67,6 @@ class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             model.navigateToMainScreen()
@@ -66,14 +79,10 @@ class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
-            ) && ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.RECORD_AUDIO
             )
         ) {
             requestPermissionLauncher.launch(
                 arrayOf(
-                    Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 )
             )
@@ -85,7 +94,6 @@ class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
             ) {
                 requestPermissionLauncher.launch(
                     arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.READ_EXTERNAL_STORAGE
                     )
                 )
