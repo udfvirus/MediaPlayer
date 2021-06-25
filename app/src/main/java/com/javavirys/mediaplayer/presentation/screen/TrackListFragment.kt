@@ -1,7 +1,24 @@
+/*
+ * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.javavirys.mediaplayer.R
@@ -23,8 +40,13 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     private lateinit var trackRecyclerView: RecyclerView
 
+    private lateinit var progressBar: ProgressBar
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        progressBar = view.findView(R.id.progress)
+
         initToolbar()
         initRecyclerView(view)
     }
@@ -40,10 +62,26 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
         model.loadTracks()
             .observe(viewLifecycleOwner) {
-                when (it) {
-                    is Result.Success -> adapter.addItem(it.data)
-                    else -> TODO()
+                if (it is Result.Success) {
+                    adapter.addItem(it.data)
                 }
             }
+        model.scannerStatusLiveData.observe(viewLifecycleOwner) {
+            when (it) {
+                is Result.Error -> TODO()
+                is Result.Progress -> showProgress()
+                is Result.Success -> hideProgress()
+            }
+        }
+    }
+
+    private fun hideProgress() {
+        progressBar.visibility = View.INVISIBLE
+        trackRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun showProgress() {
+        progressBar.visibility = View.VISIBLE
+        trackRecyclerView.visibility = View.INVISIBLE
     }
 }

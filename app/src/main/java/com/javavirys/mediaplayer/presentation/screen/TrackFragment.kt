@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
@@ -9,7 +25,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.javavirys.mediaplayer.R
-import com.javavirys.mediaplayer.core.entity.PlayerStatus
+import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -32,100 +48,60 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
 
     private val toolbar by lazy { requireActivity().findView<Toolbar>(R.id.toolbar) }
 
-    private var trackId = 0L
-
-    private var audioSessionId: Int = 0
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        trackId = savedInstanceState?.getLong(TRACK_ID_KEY, args.trackId) ?: args.trackId
-        model.setTrackId(trackId)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViews(view)
+        initClickListeners()
+        initObservers(view)
+    }
 
+    private fun initViews(view: View) {
         visualizer = view.findView(R.id.visualizer)
-
         progress = view.findView(R.id.progress)
-
+        progress.progress = 0
         playImageView = view.findView(R.id.playImageView)
-
         nextImageView = view.findView(R.id.nextImageView)
-
         prevImageView = view.findView(R.id.prevImageView)
+    }
 
+    private fun initClickListeners() {
         playImageView.setOnClickListener {
-            if (model.playerLiveData.value is PlayerStatus.Paused) {
-                model.resumeTrack()
-            } else {
-                model.pauseTrack()
-            }
+            model.mediaMetadata.value?.let { model.playMediaId(it.id) }
         }
 
         nextImageView.setOnClickListener {
-            if (model.playerLiveData.value !is PlayerStatus.NotReady) {
-                model.nextTrack()
-            }
+            model.nextTrack()
         }
 
         prevImageView.setOnClickListener {
-            if (model.playerLiveData.value !is PlayerStatus.NotReady) {
-                model.previousTrack()
-            }
+            model.previousTrack()
+        }
+    }
+
+    private fun initObservers(view: View) {
+        model.mediaMetadata.observe(viewLifecycleOwner) { mediaItem -> updateUI(view, mediaItem) }
+
+        model.mediaButtonRes.observe(viewLifecycleOwner) {
+            Glide.with(this)
+                .load(it.second)
+                .into(playImageView)
+
+            updateVisualizerState(it.first)
         }
 
-        model.playerLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is PlayerStatus.Initialized -> {
-                }
-                is PlayerStatus.Played -> {
-                    visualizer.resumeAnimation()
-                    trackId = it.trackInformation.track.id
-                    progress.max = it.trackInformation.duration
-                    toolbar.title = it.trackInformation.track.name
-
-                    Glide.with(this)
-                        .load(R.drawable.ic_baseline_stop_circle_24)
-                        .into(playImageView)
-                }
-                is PlayerStatus.Paused -> {
-                    visualizer.pauseAnimation()
-                    Glide.with(this)
-                        .load(R.drawable.ic_baseline_play_circle_24)
-                        .into(playImageView)
-                }
-                is PlayerStatus.Released -> {
-                    Glide.with(this)
-                        .load(R.drawable.ic_baseline_play_circle_24)
-                        .into(playImageView)
-                }
-            }
+        model.mediaPosition.observe(viewLifecycleOwner) { pos ->
+            progress.progress = pos.toInt()
         }
-
-        model.trackInformationLiveData.observe(viewLifecycleOwner) {
-            progress.progress = it
-        }
-
-        model.play()
     }
 
-    override fun onStop() {
-        super.onStop()
-        model.pauseTrack()
+    private fun updateVisualizerState(play: Boolean) = if (play) {
+        visualizer.resumeAnimation()
+    } else {
+        visualizer.pauseAnimation()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putLong(TRACK_ID_KEY, trackId)
-    }
-
-    override fun onDestroyView() {
-        model.stopTrack()
-        super.onDestroyView()
-    }
-
-    companion object {
-        private const val TRACK_ID_KEY = "TRACK_ID_KEY"
+    private fun updateUI(view: View, metadata: PlayingMetadata) {
+        toolbar.title = metadata.title
+        progress.max = metadata.durationMsec.toInt()
     }
 }

@@ -4,7 +4,6 @@
     package="com.javavirys.mediaplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".MediaPlayerApplication"
@@ -30,6 +29,12 @@
         <activity
             android:name=".presentation.screen.MainActivity"
             android:screenOrientation="portrait" />
+
+        <service android:name=".data.service.MediaPlaybackService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
