@@ -17,8 +17,8 @@ package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.Result
@@ -39,12 +39,12 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     private lateinit var trackRecyclerView: RecyclerView
 
-    private lateinit var progressBar: ProgressBar
+    private lateinit var progressLayout: ConstraintLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progressBar = view.findView(R.id.progress)
+        progressLayout = view.findView(R.id.progressLayout)
 
         initToolbar()
         initRecyclerView(view)
@@ -74,12 +74,12 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     }
 
     private fun hideProgress() {
-        progressBar.visibility = View.INVISIBLE
+        progressLayout.visibility = View.INVISIBLE
         trackRecyclerView.visibility = View.VISIBLE
     }
 
     private fun showProgress() {
-        progressBar.visibility = View.VISIBLE
+        progressLayout.visibility = View.VISIBLE
         trackRecyclerView.visibility = View.INVISIBLE
     }
 }

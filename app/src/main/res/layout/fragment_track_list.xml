@@ -18,10 +18,9 @@
         tools:listitem="@layout/view_track_item"
         tools:visibility="visible" />
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/layout_searching_tracks"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
