@@ -35,12 +35,10 @@ class ActivityProvider(application: Application) {
             }
 
             override fun onActivityResumed(activity: Activity) {
-                println("test: onActivityResumed = $activity")
                 activeActivity = activity
             }
 
             override fun onActivityPaused(activity: Activity) {
-                println("test: onActivityPaused = $activity")
                 activeActivity = null
             }
 

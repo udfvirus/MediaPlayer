@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.javavirys.mediaplayer.domain.interactor
+package com.javavirys.mediaplayer.data.mapper
 
-import com.javavirys.mediaplayer.domain.interactor.additional.InteractorWithoutParam
-import com.javavirys.mediaplayer.domain.repository.TrackRepository
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
+import com.javavirys.mediaplayer.util.extension.flag
 
-class GetTrackCount(
-    private val trackRepository: TrackRepository
-) : InteractorWithoutParam<Int>() {
+object MediaMetadataMapper {
 
-    override suspend fun execute() = trackRepository.getTrackCount()
+    fun toMediaItem(param: MediaMetadataCompat) =
+        MediaBrowserCompat.MediaItem(param.description, param.flag)
 }

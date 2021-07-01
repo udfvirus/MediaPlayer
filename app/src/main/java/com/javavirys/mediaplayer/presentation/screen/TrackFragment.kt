@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
@@ -69,13 +68,9 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
             model.mediaMetadata.value?.let { model.playMediaId(it.id) }
         }
 
-        nextImageView.setOnClickListener {
-            model.nextTrack()
-        }
+        nextImageView.setOnClickListener { model.nextTrack() }
 
-        prevImageView.setOnClickListener {
-            model.previousTrack()
-        }
+        prevImageView.setOnClickListener { model.previousTrack() }
     }
 
     private fun initObservers(view: View) {
