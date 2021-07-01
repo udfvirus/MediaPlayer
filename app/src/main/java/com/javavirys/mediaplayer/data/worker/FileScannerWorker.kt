@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.javavirys.mediaplayer.data.worker
 
-import android.os.Environment
 import com.javavirys.mediaplayer.data.database.dao.TrackDao
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
 import java.io.File
@@ -24,7 +22,7 @@ import java.io.File
 class FileScannerWorker(private val trackDao: TrackDao) {
 
     suspend fun doWork() {
-        scanDirectories(Environment.getExternalStorageDirectory().path)
+        scanDirectories(STORAGE_PATH)
     }
 
     private suspend fun scanDirectories(path: String) {
@@ -56,5 +54,10 @@ class FileScannerWorker(private val trackDao: TrackDao) {
                 }
             }
         }
+    }
+
+    companion object {
+
+        private const val STORAGE_PATH = "/storage" // Environment.getExternalStorageDirectory().path
     }
 }

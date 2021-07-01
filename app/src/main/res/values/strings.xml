@@ -10,4 +10,8 @@
     <!-- Notificaiton Channel -->
     <string name="notification_channel">Now Playing</string>
     <string name="notification_channel_description">Shows what music is currently playing in UAMP</string>
+
+    <!-- TrackList -->
+    <string name="track_list_progress_title">Wait a while the file system is scanned for music</string>
+
 </resources>
