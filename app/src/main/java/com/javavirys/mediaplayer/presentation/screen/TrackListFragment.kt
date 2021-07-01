@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
@@ -60,12 +59,11 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         trackRecyclerView = view.findView(R.id.trackRecyclerView)
         trackRecyclerView.adapter = adapter
 
-        model.loadTracks()
-            .observe(viewLifecycleOwner) {
-                if (it is Result.Success) {
-                    adapter.addItem(it.data)
-                }
+        model.tracksLiveData.observe(viewLifecycleOwner) {
+            if (it is Result.Success) {
+                adapter.addItem(it.data)
             }
+        }
         model.scannerStatusLiveData.observe(viewLifecycleOwner) {
             when (it) {
                 is Result.Error -> TODO()

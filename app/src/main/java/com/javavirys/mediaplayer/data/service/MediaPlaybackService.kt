@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.javavirys.mediaplayer.data.service
 
 import android.app.Notification
@@ -41,14 +40,13 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.gms.cast.MediaQueueItem
 import com.google.android.gms.cast.framework.CastContext
 import com.javavirys.mediaplayer.R
-import com.javavirys.mediaplayer.data.mapper.TrackMapper
+import com.javavirys.mediaplayer.data.mapper.MediaMetadataMapper
 import com.javavirys.mediaplayer.di.DatabaseFactory
 import com.javavirys.mediaplayer.util.extension.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-
 
 class MediaPlaybackService : MediaBrowserServiceCompat() {
 
@@ -102,9 +100,18 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     }
 
     private val serviceJob = SupervisorJob()
+
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private var tracks: List<MediaMetadataCompat>? = null
+
+    private val mediaStorage by lazy {
+        MediaStorage(
+            DatabaseFactory.getDatabaseInstance(
+                applicationContext
+            )
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -131,12 +138,8 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         )
 
         // Load tracks
-        val database = DatabaseFactory.getDatabaseInstance(applicationContext)
-
         serviceScope.launch {
-            tracks = database.getTrackDao()
-                .getTrackList()
-                .map { TrackMapper().toMediaMetadataCompat(it) }
+            mediaStorage.load()
         }
 
         mediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -218,22 +221,32 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-        val mediaItems = mutableListOf<MediaBrowserCompat.MediaItem>()
-
         if (parentId == ROOT_ID) {
-            tracks?.forEach {
-                mediaItems.add(
-                    MediaBrowserCompat.MediaItem(
-                        it.description,
-                        it.flag
-                    )
-                )
-            }
-            result.sendResult(mediaItems)
+            sendResultForRootId(result)
         } else {
             result.sendResult(null)
         }
     }
+
+    private fun sendResultForRootId(result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
+        val resultsSent = mediaStorage.whenReady {
+            val mediaItems = mutableListOf<MediaBrowserCompat.MediaItem>()
+            tracks = it
+            it?.forEach { item -> mediaItems.add(MediaMetadataMapper.toMediaItem(item)) }
+            result.sendResult(mediaItems)
+        }
+        if (!resultsSent) {
+            result.detach()
+        }
+    }
+
+    override fun onDestroy() {
+        serviceJob.cancel()
+
+        exoPlayer.removeListener(playerListener)
+        exoPlayer.release()
+    }
+
 
     private inner class UampPlaybackPreparer : MediaSessionConnector.PlaybackPreparer {
 
@@ -263,7 +276,6 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             extras: Bundle?
         ) {
             // MediaId
-            println("test: onPrepareFromMediaId.mediaId=$mediaId")
             val itemToPlay = tracks?.find { item ->
                 item.id.toString() == mediaId
             }
