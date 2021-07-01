@@ -17,9 +17,7 @@
 package com.javavirys.mediaplayer.di
 
 import android.content.ComponentName
-import android.media.MediaPlayer
 import com.javavirys.mediaplayer.data.service.MediaPlaybackService
-import com.javavirys.mediaplayer.data.service.MediaService
 import com.javavirys.mediaplayer.util.MusicServiceConnection
 import org.koin.dsl.module
 
@@ -30,6 +28,4 @@ val mediaModule = module {
             ComponentName(get(), MediaPlaybackService::class.java)
         )
     }
-    single { MediaPlayer() }
-    single { MediaService(get()) }
 }

@@ -19,8 +19,10 @@ package com.javavirys.mediaplayer.util.extension
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.core.view.ViewCompat
 import com.google.android.material.snackbar.Snackbar
 
@@ -54,4 +56,18 @@ fun View.showSnackbar(
             action(this)
         }.show()
     }
+}
+
+fun AppCompatSeekBar.setOnProgressChanged(
+    onProgressChanged: (seekBar: SeekBar?, progress: Int, fromUser: Boolean) -> Unit
+) {
+    setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            onProgressChanged(seekBar, progress, fromUser)
+        }
+
+        override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+        override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+    })
 }

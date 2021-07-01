@@ -89,4 +89,9 @@ object PlayerUtils {
         val transportControls = musicServiceConnection.transportControls
         transportControls.skipToPrevious()
     }
+
+    fun updateTimePosition(musicServiceConnection: MusicServiceConnection, position: Long) {
+        val transportControls = musicServiceConnection.transportControls
+        transportControls.seekTo(position)
+    }
 }

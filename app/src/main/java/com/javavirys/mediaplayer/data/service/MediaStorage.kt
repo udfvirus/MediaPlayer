@@ -31,8 +31,8 @@ class MediaStorage(database: AppDatabase) {
 
     private var tracks: List<MediaMetadataCompat>? = null
         set(value) {
-            field = value
             synchronized(onReadyListener) {
+                field = value
                 onReadyListener(value)
             }
         }

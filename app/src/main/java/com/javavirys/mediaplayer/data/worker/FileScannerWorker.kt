@@ -15,6 +15,7 @@
  */
 package com.javavirys.mediaplayer.data.worker
 
+import android.os.Environment
 import com.javavirys.mediaplayer.data.database.dao.TrackDao
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
 import java.io.File
@@ -22,16 +23,21 @@ import java.io.File
 class FileScannerWorker(private val trackDao: TrackDao) {
 
     suspend fun doWork() {
-        scanDirectories(STORAGE_PATH)
+        scanDirectories(Environment.getExternalStorageDirectory().path) // scan sdcard
+        scanDirectories(STORAGE_DIR_PATH) // scan removable memory card
     }
 
     private suspend fun scanDirectories(path: String) {
-        val file = File(path)
-        file.list()?.let {
-            it.forEach { item ->
-                val filePath = "$path/$item"
-                processFilePath(filePath)
+        try {
+            val file = File(path)
+            file.list()?.let {
+                it.forEach { item ->
+                    val filePath = "$path/$item"
+                    processFilePath(filePath)
+                }
             }
+        } catch (exception: Exception) {
+            exception.printStackTrace()
         }
     }
 
@@ -58,6 +64,6 @@ class FileScannerWorker(private val trackDao: TrackDao) {
 
     companion object {
 
-        private const val STORAGE_PATH = "/storage" // Environment.getExternalStorageDirectory().path
+        private const val STORAGE_DIR_PATH = "/storage"
     }
 }
