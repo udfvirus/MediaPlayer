@@ -15,7 +15,7 @@
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/music_note_character" />
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
+    <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

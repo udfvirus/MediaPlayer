@@ -115,6 +115,10 @@ class TrackViewModel(
         PlayerUtils.playMediaId(musicServiceConnection, mediaId)
     }
 
+    fun updatePosition(position: Int) {
+        PlayerUtils.updateTimePosition(musicServiceConnection, position.toLong())
+    }
+
     companion object {
         private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
     }

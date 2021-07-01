@@ -18,15 +18,16 @@ package com.javavirys.mediaplayer.presentation.screen
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
+import com.javavirys.mediaplayer.util.extension.setOnProgressChanged
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
@@ -43,7 +44,7 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
 
     private lateinit var prevImageView: ImageView
 
-    private lateinit var progress: LinearProgressIndicator
+    private lateinit var progress: AppCompatSeekBar
 
     private val toolbar by lazy { requireActivity().findView<Toolbar>(R.id.toolbar) }
 
@@ -58,6 +59,11 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
         visualizer = view.findView(R.id.visualizer)
         progress = view.findView(R.id.progress)
         progress.progress = 0
+        progress.setOnProgressChanged { _, progress, fromUser ->
+            if (fromUser) {
+                model.updatePosition(progress)
+            }
+        }
         playImageView = view.findView(R.id.playImageView)
         nextImageView = view.findView(R.id.nextImageView)
         prevImageView = view.findView(R.id.prevImageView)
