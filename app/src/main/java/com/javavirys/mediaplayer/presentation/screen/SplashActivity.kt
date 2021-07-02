@@ -21,6 +21,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -32,9 +33,7 @@ import com.javavirys.mediaplayer.util.extension.findView
 import com.javavirys.mediaplayer.util.extension.showSnackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
-
-    override val model: SplashViewModel by viewModel()
+class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
 
     private val splashConstraintLayout by lazy { findView<ConstraintLayout>(R.id.splashConstraintLayout) }
 
@@ -49,27 +48,27 @@ class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
                         Snackbar.LENGTH_INDEFINITE,
                         R.string.ok
                     ) {
-                        navigateToMainScreen()
+                        navigateToMainScreenAndCheckPermissions()
                     }
                     return@registerForActivityResult
                 }
             }
-            model.navigateToMainScreen()
+            navigateToMainScreen()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Glide.with(this).load(R.drawable.splash).into(logoImageView)
-        navigateToMainScreen()
+        navigateToMainScreenAndCheckPermissions()
     }
 
-    private fun navigateToMainScreen() {
+    private fun navigateToMainScreenAndCheckPermissions() {
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            model.navigateToMainScreen()
+            navigateToMainScreen()
         } else {
             requestPermission()
         }
@@ -99,5 +98,10 @@ class SplashActivity : BaseActivity<SplashViewModel>(R.layout.activity_splash) {
                 )
             }
         }
+    }
+
+    private fun navigateToMainScreen() {
+        val model: SplashViewModel by viewModel()
+        model.navigateToMainScreen()
     }
 }

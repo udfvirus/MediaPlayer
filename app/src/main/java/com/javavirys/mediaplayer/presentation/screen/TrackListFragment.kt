@@ -119,9 +119,10 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
                 .load(it.second)
                 .into(playImageView)
             if (it.first) {
-                rotateAnimation.start()
+                coverImageView.startAnimation(rotateAnimation)
             } else {
                 rotateAnimation.cancel()
+                rotateAnimation.reset()
             }
         }
     }
@@ -130,7 +131,6 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         playingLayout = view.findView(R.id.playingLayout)
         playingLayout.isVisible = false
         coverImageView = view.findView(R.id.coverImageView)
-        coverImageView.animation = rotateAnimation
         nameTextView = view.findView(R.id.nameTextView)
         singerTextView = view.findView(R.id.singerTextView)
         playImageView = view.findView(R.id.playImageView)

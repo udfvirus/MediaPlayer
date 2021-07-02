@@ -106,11 +106,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     private var tracks: List<MediaMetadataCompat>? = null
 
     private val mediaStorage by lazy {
-        MediaStorage(
-            DatabaseFactory.getDatabaseInstance(
-                applicationContext
-            )
-        )
+        MediaStorage(DatabaseFactory.getDatabaseInstance(applicationContext))
     }
 
     override fun onCreate() {
