@@ -17,37 +17,71 @@ package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.javavirys.mediaplayer.R
+import com.javavirys.mediaplayer.core.entity.FileSystemTrack
+import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.core.entity.Result
 import com.javavirys.mediaplayer.presentation.adapter.TrackAdapter
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
+import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_track_list) {
 
     override val model: TrackListViewModel by viewModel()
 
-    private val adapter by lazy {
-        TrackAdapter {
-            model.navigateToTrackScreen(it)
-        }
-    }
+    private val trackViewModel: TrackViewModel by viewModel()
+
+    private val adapter by lazy { TrackAdapter { model.navigateToTrackScreen(it) } }
 
     private lateinit var trackRecyclerView: RecyclerView
 
     private lateinit var progressLayout: ConstraintLayout
 
+    private lateinit var playingLayout: CardView
+
+    private lateinit var coverImageView: ImageView
+
+    private lateinit var playImageView: ImageView
+
+    private lateinit var nextImageView: ImageView
+
+    private lateinit var nameTextView: TextView
+
+    private lateinit var singerTextView: TextView
+
+    private val rotateAnimation = RotateAnimation(
+        0f,
+        360f,
+        Animation.RELATIVE_TO_SELF,
+        0.5f,
+        Animation.RELATIVE_TO_SELF,
+        0.5f
+    ).also {
+        it.repeatCount = Animation.INFINITE
+        it.duration = 3000
+        it.interpolator = LinearInterpolator()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         progressLayout = view.findView(R.id.progressLayout)
-
         initToolbar()
         initRecyclerView(view)
+        initPlayingLayout(view)
     }
 
     private fun initToolbar() {
@@ -71,6 +105,55 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
                 is Result.Success -> hideProgress()
             }
         }
+    }
+
+    private fun initPlayingLayout(view: View) {
+        initPlayingLayoutViews(view)
+        initPlayingLayoutListeners()
+
+        trackViewModel.mediaMetadata.observe(viewLifecycleOwner) {
+            updatePlayingLayout(it)
+        }
+        trackViewModel.mediaButtonRes.observe(viewLifecycleOwner) {
+            Glide.with(this)
+                .load(it.second)
+                .into(playImageView)
+            if (it.first) {
+                rotateAnimation.start()
+            } else {
+                rotateAnimation.cancel()
+            }
+        }
+    }
+
+    private fun initPlayingLayoutViews(view: View) {
+        playingLayout = view.findView(R.id.playingLayout)
+        playingLayout.isVisible = false
+        coverImageView = view.findView(R.id.coverImageView)
+        coverImageView.animation = rotateAnimation
+        nameTextView = view.findView(R.id.nameTextView)
+        singerTextView = view.findView(R.id.singerTextView)
+        playImageView = view.findView(R.id.playImageView)
+        nextImageView = view.findView(R.id.nextImageView)
+    }
+
+    private fun initPlayingLayoutListeners() {
+        playImageView.setOnClickListener {
+            trackViewModel.mediaMetadata.value?.let { trackViewModel.playMediaId(it.id) }
+        }
+        nextImageView.setOnClickListener { trackViewModel.nextTrack() }
+
+        playingLayout.setOnClickListener {
+            trackViewModel.mediaMetadata.value?.let {
+                model.navigateToTrackScreen(FileSystemTrack(it.id.toLong()))
+            }
+        }
+    }
+
+    private fun updatePlayingLayout(metadata: PlayingMetadata) {
+        playingLayout.isVisible = true
+        nameTextView.text = metadata.title
+        singerTextView.text = getString(R.string.unknown_artist)
     }
 
     private fun hideProgress() {

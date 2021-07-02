@@ -42,13 +42,11 @@ class TrackListViewModel(
         ) {
             scannerStatusLiveData.value = Result.Success(Unit)
             children.map { child ->
-                val subtitle = child.description.subtitle ?: ""
                 tracksLiveData.value =
                     Result.Success(
                         FileSystemTrack(
                             child.mediaId!!.toLong(),
                             child.description.title.toString(),
-                            child.mediaId!!,
                             child.mediaId!!
                         )
                     )

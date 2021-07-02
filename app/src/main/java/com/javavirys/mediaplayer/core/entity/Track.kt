@@ -18,6 +18,5 @@ package com.javavirys.mediaplayer.core.entity
 
 interface Track {
     val id: Long
-    val mediaId: String
     val name: String
 }
