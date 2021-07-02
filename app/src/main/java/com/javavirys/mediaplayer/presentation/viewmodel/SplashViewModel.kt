@@ -18,14 +18,22 @@ package com.javavirys.mediaplayer.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.javavirys.mediaplayer.presentation.navigation.SplashRouter
+import com.javavirys.mediaplayer.util.MusicServiceConnection
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SplashViewModel(private val router: SplashRouter) : BaseViewModel() {
+class SplashViewModel(
+    private val router: SplashRouter,
+    private val musicServiceConnection: MusicServiceConnection
+) : BaseViewModel() {
 
     fun navigateToMainScreen() {
-        viewModelScope.launch {
-            delay(SPLASH_DELAY)
+        if (musicServiceConnection.isConnected.value == null) {
+            viewModelScope.launch {
+                delay(SPLASH_DELAY)
+                router.navigateToMainScreen()
+            }
+        } else {
             router.navigateToMainScreen()
         }
     }
