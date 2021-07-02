@@ -105,8 +105,8 @@ class TrackViewModel(
         }
 
         val resourceId = when (playbackState.isPlaying) {
-            true -> R.drawable.ic_baseline_stop_circle_24
-            else -> R.drawable.ic_baseline_play_circle_24
+            true -> R.drawable.ic_pause_black_24dp
+            else -> R.drawable.ic_play_arrow_black_24dp
         }
         mediaButtonRes.postValue(Pair(playbackState.isPlaying, resourceId))
     }

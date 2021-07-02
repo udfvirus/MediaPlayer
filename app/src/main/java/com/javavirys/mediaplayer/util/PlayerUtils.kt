@@ -36,7 +36,7 @@ object PlayerUtils {
         val transportControls = musicServiceConnection.transportControls
 
         val isPrepared = musicServiceConnection.playbackState.value?.isPrepared ?: false
-        if (isPrepared && mediaItem.mediaId == nowPlaying?.id) {
+        if (isPrepared && mediaItem.id.toString() == nowPlaying?.id) {
             musicServiceConnection.playbackState.value?.let { playbackState ->
                 when {
                     playbackState.isPlaying ->
@@ -46,7 +46,7 @@ object PlayerUtils {
                         Log.w(
                             LOG_TAG,
                             "Playable item clicked but neither play nor pause are enabled!" +
-                                    " (mediaId=${mediaItem.mediaId})"
+                                    " (mediaId=${mediaItem.id})"
                         )
                     }
                 }
