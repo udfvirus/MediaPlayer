@@ -27,7 +27,7 @@ interface TrackDao {
     suspend fun insert(trackDbo: TrackDbo): Long
 
     @Delete
-    suspend fun delete(vararg trackDbo: TrackDbo)
+    suspend fun delete(trackDbo: TrackDbo)
 
     @Query("SELECT * FROM ${TrackDbo.TABLE_NAME} ORDER BY name")
     fun getAllTracks(): Flow<List<TrackDbo>>

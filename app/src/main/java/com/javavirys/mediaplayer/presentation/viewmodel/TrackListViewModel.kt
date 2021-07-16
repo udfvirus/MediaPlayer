@@ -17,22 +17,31 @@ package com.javavirys.mediaplayer.presentation.viewmodel
 
 import android.support.v4.media.MediaBrowserCompat
 import androidx.lifecycle.MutableLiveData
-import com.javavirys.mediaplayer.core.entity.FileSystemTrack
 import com.javavirys.mediaplayer.core.entity.Result
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.data.service.MediaPlaybackService.Companion.ROOT_ID
+import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInteractor
 import com.javavirys.mediaplayer.presentation.navigation.MainRouter
 import com.javavirys.mediaplayer.util.MusicServiceConnection
 import com.javavirys.mediaplayer.util.PlayerUtils
 
 class TrackListViewModel(
     private val router: MainRouter,
-    musicServiceConnection: MusicServiceConnection
+    private val deleteTrackInteractor: DeleteTrackInteractor,
+    musicServiceConnection: MusicServiceConnection,
 ) : BaseViewModel() {
 
     val scannerStatusLiveData = MutableLiveData<Result<Unit>>()
 
     val tracksLiveData = MutableLiveData<Result<Track>>()
+
+    val selectedModeTrackLiveData = MutableLiveData<Boolean>()
+
+    val selectedTrackListLiveData = MutableLiveData<List<Track>>()
+
+    val updateTrackLiveData = MutableLiveData<Track>()
+
+    val removeTrackLiveData = MutableLiveData<Track>()
 
     private val subscriptionCallback = object : MediaBrowserCompat.SubscriptionCallback() {
 
@@ -40,14 +49,15 @@ class TrackListViewModel(
             parentId: String,
             children: List<MediaBrowserCompat.MediaItem>
         ) {
+
             scannerStatusLiveData.value = Result.Success(Unit)
             children.map { child ->
                 tracksLiveData.value =
                     Result.Success(
-                        FileSystemTrack(
+                        Track(
                             child.mediaId!!.toLong(),
                             child.description.title.toString(),
-                            child.mediaId!!
+                            child.description.mediaUri.toString()
                         )
                     )
             }
@@ -63,6 +73,21 @@ class TrackListViewModel(
         musicServiceConnection.unsubscribe(ROOT_ID, subscriptionCallback)
     }
 
+    fun onTrackClicked(track: Track, list: List<Track>) {
+        if (selectedModeTrackLiveData.value == true) {
+            track.selected = !track.selected
+            updateTrackLiveData.value = track
+            val selectedTracks = list.filter { it.selected }
+
+            selectedTrackListLiveData.value = selectedTracks
+            if (selectedTracks.isEmpty()) {
+                selectedModeTrackLiveData.value = false
+            }
+        } else {
+            navigateToTrackScreen(track)
+        }
+    }
+
     fun navigateToTrackScreen(track: Track) {
         playMedia(track, false)
         router.navigateToTrackScreen(track)
@@ -70,5 +95,31 @@ class TrackListViewModel(
 
     private fun playMedia(mediaItem: Track, pauseAllowed: Boolean = true) {
         PlayerUtils.playMedia(musicServiceConnection, mediaItem, pauseAllowed)
+    }
+
+    fun setSelectedMode(track: Track) {
+        if (selectedModeTrackLiveData.value != true) {
+            selectedModeTrackLiveData.value = true
+            updateTrackLiveData.value = track.also { it.selected = true }
+            selectedTrackListLiveData.value = listOf(track)
+        }
+    }
+
+    fun deleteSelectedTracks() {
+        selectedTrackListLiveData.value?.let {
+            deleteTracks(it)
+        }
+    }
+
+    private fun deleteTracks(list: List<Track>) {
+        selectedModeTrackLiveData.value = false
+        launch(
+            backgroundCode = {
+                list.forEach {
+                    deleteTrackInteractor.execute(it)
+                    removeTrackLiveData.postValue(it)
+                }
+            }
+        )
     }
 }

@@ -19,6 +19,7 @@ package com.javavirys.mediaplayer.presentation.adapter
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.javavirys.mediaplayer.R
@@ -26,7 +27,8 @@ import com.javavirys.mediaplayer.core.entity.Track
 
 class TrackViewHolder(
     view: View,
-    private val onItemClick: (item: Track) -> Unit
+    private val onItemClick: (item: Track) -> Unit,
+    private val onItemLongClick: (item: Track) -> Unit
 ) : RecyclerView.ViewHolder(view) {
 
     private val nameTextView by lazy {
@@ -43,10 +45,20 @@ class TrackViewHolder(
         )
     }
 
+    private val circleCheckBox by lazy {
+        ViewCompat.requireViewById<AppCompatCheckBox>(
+            itemView,
+            R.id.circleCheckBox
+        )
+    }
+
     fun bind(item: Track) {
-        itemView.setOnClickListener {
-            onItemClick(item)
+        itemView.setOnClickListener { onItemClick(item) }
+        itemView.setOnLongClickListener {
+            onItemLongClick(item)
+            true
         }
         nameTextView.text = item.name
+        circleCheckBox.isChecked = item.selected
     }
 }

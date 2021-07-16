@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath Dependencies.gradle
-        classpath Dependencies.kotlinGradlePlugin
-        classpath Dependencies.navigationSafeArgsGradlePlugin
-    }
-}
+package com.javavirys.mediaplayer.presentation.viewmodel
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class MainSharedViewModel : ViewModel() {
+
+    val enabledBackPressedLiveData = MutableLiveData<Boolean>()
+
+    val backKeyPressedLiveData = MutableLiveData<Unit>()
 }

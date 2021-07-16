@@ -3,7 +3,7 @@
     <string name="track_list_title">Track list</string>
 
     <string name="permission_denied">You have not granted permission to the application. Without permissions, the application will not be able to work. Please grant permissions!</string>
-    <string name="permission_not_available">Permissions is not available. Request permission to read external storage and write sound (needed for audio visualization).</string>
+    <string name="permission_not_available">Permissions is not available. Request permission to read and write external storage.</string>
 
     <string name="ok">OK</string>
 
@@ -14,5 +14,6 @@
     <!-- TrackList -->
     <string name="track_list_progress_title">Wait a while the file system is scanned for music</string>
     <string name="unknown_artist">Unknown artist</string>
+    <string name="menu_delete">Delete</string>
 
 </resources>

@@ -18,17 +18,31 @@ package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
 import com.javavirys.mediaplayer.R
+import com.javavirys.mediaplayer.presentation.viewmodel.MainSharedViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 class MainActivity : BaseActivity<MainViewModel>(R.layout.activity_main) {
 
     override val model: MainViewModel by viewModel()
 
+    private val backPressedViewModelBackPressed by lazy {
+        ViewModelProvider(this)[MainSharedViewModel::class.java]
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(ActivityCompat.requireViewById(this, R.id.toolbar))
+//        backPressedViewModelBackPressed.enabledBackPressedLiveData.observe(this) { }
+    }
+
+    override fun onBackPressed() {
+        if (backPressedViewModelBackPressed.enabledBackPressedLiveData.value != true) {
+            super.onBackPressed()
+        } else {
+            backPressedViewModelBackPressed.backKeyPressedLiveData.value = Unit
+        }
     }
 }

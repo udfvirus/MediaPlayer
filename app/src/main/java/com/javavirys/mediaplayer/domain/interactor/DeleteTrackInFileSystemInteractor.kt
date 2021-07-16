@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath Dependencies.gradle
-        classpath Dependencies.kotlinGradlePlugin
-        classpath Dependencies.navigationSafeArgsGradlePlugin
-    }
-}
+package com.javavirys.mediaplayer.domain.interactor
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.domain.interactor.additional.InteractorWithoutResult
+import java.io.File
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class DeleteTrackInFileSystemInteractor : InteractorWithoutResult<Track>() {
+
+    override suspend fun exec(param: Track) {
+        File(param.path).delete()
+    }
 }

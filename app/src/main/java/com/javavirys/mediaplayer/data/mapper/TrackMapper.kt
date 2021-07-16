@@ -17,7 +17,6 @@ package com.javavirys.mediaplayer.data.mapper
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.javavirys.mediaplayer.core.entity.FileSystemTrack
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
 import com.javavirys.mediaplayer.util.extension.flag
@@ -27,8 +26,9 @@ import com.javavirys.mediaplayer.util.extension.title
 
 class TrackMapper {
 
-    fun toTrack(trackDbo: TrackDbo): Track =
-        FileSystemTrack(trackDbo.id, trackDbo.name, trackDbo.filePath)
+    fun toTrack(trackDbo: TrackDbo): Track = Track(trackDbo.id, trackDbo.name, trackDbo.filePath)
+
+    fun toTrackDbo(track: Track) = TrackDbo(track.id, track.name, track.path)
 
     fun toMediaMetadataCompat(trackDbo: TrackDbo): MediaMetadataCompat =
         MediaMetadataCompat.Builder().apply {

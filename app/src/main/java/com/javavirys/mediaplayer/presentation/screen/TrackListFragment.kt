@@ -16,6 +16,9 @@
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -26,13 +29,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.javavirys.mediaplayer.R
-import com.javavirys.mediaplayer.core.entity.FileSystemTrack
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.core.entity.Result
+import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.presentation.adapter.TrackAdapter
+import com.javavirys.mediaplayer.presentation.viewmodel.MainSharedViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
@@ -45,7 +50,14 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     private val trackViewModel: TrackViewModel by viewModel()
 
-    private val adapter by lazy { TrackAdapter { model.navigateToTrackScreen(it) } }
+    private val adapter by lazy {
+        TrackAdapter(
+            onItemClick = { item, list ->
+                model.onTrackClicked(item, list)
+            },
+            onItemLongClick = { model.setSelectedMode(it) }
+        )
+    }
 
     private lateinit var trackRecyclerView: RecyclerView
 
@@ -76,6 +88,10 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         it.interpolator = LinearInterpolator()
     }
 
+    private val mainSharedViewModel by lazy {
+        ViewModelProvider(requireActivity())[MainSharedViewModel::class.java]
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressLayout = view.findView(R.id.progressLayout)
@@ -104,6 +120,26 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
                 is Result.Progress -> showProgress()
                 is Result.Success -> hideProgress()
             }
+        }
+
+        model.selectedModeTrackLiveData.observe(viewLifecycleOwner) {
+            setHasOptionsMenu(it)
+            mainSharedViewModel.enabledBackPressedLiveData.value = it
+        }
+
+        model.updateTrackLiveData.observe(viewLifecycleOwner) {
+            adapter.updateItem(it)
+        }
+
+        model.selectedTrackListLiveData.observe(viewLifecycleOwner) { }
+
+        model.removeTrackLiveData.observe(viewLifecycleOwner) {
+            adapter.removeItem(it)
+        }
+
+        mainSharedViewModel.backKeyPressedLiveData.observe(viewLifecycleOwner) {
+            adapter.deselectAllItems()
+            model.selectedModeTrackLiveData.value = false
         }
     }
 
@@ -145,7 +181,7 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
         playingLayout.setOnClickListener {
             trackViewModel.mediaMetadata.value?.let {
-                model.navigateToTrackScreen(FileSystemTrack(it.id.toLong()))
+                model.navigateToTrackScreen(Track(it.id.toLong()))
             }
         }
     }
@@ -164,5 +200,18 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     private fun showProgress() {
         progressLayout.visibility = View.VISIBLE
         trackRecyclerView.visibility = View.INVISIBLE
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.track_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.deleteMenuItem -> {
+            println("test: onOptionsItemSelected =  R.id.deleteMenuItem")
+            model.deleteSelectedTracks()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 }

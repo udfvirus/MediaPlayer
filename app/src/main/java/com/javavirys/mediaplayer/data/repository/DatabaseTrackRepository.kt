@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath Dependencies.gradle
-        classpath Dependencies.kotlinGradlePlugin
-        classpath Dependencies.navigationSafeArgsGradlePlugin
-    }
-}
+package com.javavirys.mediaplayer.data.repository
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.data.database.dao.TrackDao
+import com.javavirys.mediaplayer.data.mapper.TrackMapper
+import com.javavirys.mediaplayer.domain.repository.TrackRepository
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class DatabaseTrackRepository(private val trackDao: TrackDao) : TrackRepository {
+
+    override suspend fun getTrackById(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun remove(track: Track) {
+        trackDao.delete(TrackMapper().toTrackDbo(track))
+    }
 }

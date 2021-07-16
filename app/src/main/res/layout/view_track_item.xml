@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="6dp"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="15dp"
-    app:cardElevation="10dp"
-    android:layout_margin="6dp">
+    app:cardElevation="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -24,20 +24,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/circleCheckBox"
+            style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:button="@drawable/custom_checkbox"
+            android:enabled="false"
+            app:layout_constraintBottom_toBottomOf="@+id/logoImageView"
+            app:layout_constraintEnd_toEndOf="@+id/logoImageView"
+            tools:checked="true" />
+
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textSize="22sp"
-            android:maxLines="1"
             android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="22sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/logoImageView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Track 1"/>
+            tools:text="Track 1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

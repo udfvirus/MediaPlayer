@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath Dependencies.gradle
-        classpath Dependencies.kotlinGradlePlugin
-        classpath Dependencies.navigationSafeArgsGradlePlugin
-    }
-}
+package com.javavirys.mediaplayer.domain.interactor
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.domain.interactor.additional.InteractorWithoutResult
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class DeleteTrackInteractor(
+    private val deleteTrackInDBInteractor: DeleteTrackInDBInteractor,
+    private val deleteTrackInFileSystemInteractor: DeleteTrackInFileSystemInteractor
+) : InteractorWithoutResult<Track>() {
+
+    override suspend fun exec(param: Track) {
+        deleteTrackInDBInteractor.execute(param)
+        deleteTrackInFileSystemInteractor.execute(param)
+    }
 }

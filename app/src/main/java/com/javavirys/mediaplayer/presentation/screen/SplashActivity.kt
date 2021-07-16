@@ -67,6 +67,10 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
             navigateToMainScreen()
         } else {
@@ -79,10 +83,15 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
+            && ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         ) {
             requestPermissionLauncher.launch(
                 arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             )
         } else {
@@ -93,7 +102,8 @@ class SplashActivity : AppCompatActivity(R.layout.activity_splash) {
             ) {
                 requestPermissionLauncher.launch(
                     arrayOf(
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
                     )
                 )
             }
