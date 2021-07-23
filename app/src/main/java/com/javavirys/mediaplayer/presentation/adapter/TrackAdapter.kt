@@ -23,15 +23,16 @@ import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.util.extension.inflate
 
 class TrackAdapter(
-    private val onItemClick: (item: Track) -> Unit
-) :
-    RecyclerView.Adapter<TrackViewHolder>() {
+    private val onItemClick: (item: Track, items: List<Track>) -> Unit,
+    private val onItemLongClick: (item: Track) -> Unit
+) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private val items = mutableListOf<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TrackViewHolder(
         parent.inflate(R.layout.view_track_item),
-        onItemClick
+        { onItemClick(it, items) },
+        onItemLongClick
     )
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
@@ -45,6 +46,37 @@ class TrackAdapter(
         if (foundItem == null) {
             items.add(track)
             notifyItemInserted(items.lastIndex)
+        }
+    }
+
+    fun updateItem(track: Track) {
+        items.forEachIndexed { index, item ->
+            if (track.id == item.id) {
+                notifyItemChanged(index)
+                return@forEachIndexed
+            }
+        }
+    }
+
+    fun deselectAllItems() {
+        items.forEachIndexed { index, item ->
+            if (item.selected) {
+                item.selected = false
+                notifyItemChanged(index)
+            }
+        }
+    }
+
+    fun removeItem(track: Track) {
+        val iterator = items.iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            if (iterator.next().id == track.id) {
+                iterator.remove()
+                notifyItemRemoved(index)
+                break
+            }
+            index++
         }
     }
 }

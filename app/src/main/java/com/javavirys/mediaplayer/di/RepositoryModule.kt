@@ -16,7 +16,11 @@
 
 package com.javavirys.mediaplayer.di
 
+import com.javavirys.mediaplayer.data.repository.DatabaseTrackRepository
+import com.javavirys.mediaplayer.domain.repository.TrackRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
+
+    single<TrackRepository> { DatabaseTrackRepository(get()) }
 }

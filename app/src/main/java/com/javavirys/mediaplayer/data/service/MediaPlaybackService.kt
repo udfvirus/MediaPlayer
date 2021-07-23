@@ -103,8 +103,6 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
-    private var tracks: List<MediaMetadataCompat>? = null
-
     private val mediaStorage by lazy {
         MediaStorage(DatabaseFactory.getDatabaseInstance(applicationContext))
     }
@@ -227,8 +225,10 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     private fun sendResultForRootId(result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
         val resultsSent = mediaStorage.whenReady {
             val mediaItems = mutableListOf<MediaBrowserCompat.MediaItem>()
-            tracks = it
-            it?.forEach { item -> mediaItems.add(MediaMetadataMapper.toMediaItem(item)) }
+
+            mediaStorage.getTrackList().forEach { item ->
+                mediaItems.add(MediaMetadataMapper.toMediaItem(item))
+            }
             result.sendResult(mediaItems)
         }
         if (!resultsSent) {
@@ -272,7 +272,9 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             extras: Bundle?
         ) {
             // MediaId
-            val itemToPlay = tracks?.find { item ->
+            val tracks = mediaStorage.getTrackList()
+
+            val itemToPlay = tracks.find { item ->
                 item.id.toString() == mediaId
             }
             if (itemToPlay == null) {
@@ -284,7 +286,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
                     C.TIME_UNSET
                 ) ?: C.TIME_UNSET
                 preparePlaylist(
-                    tracks!!,
+                    tracks,
                     itemToPlay,
                     playWhenReady,
                     playbackStartPositionMs

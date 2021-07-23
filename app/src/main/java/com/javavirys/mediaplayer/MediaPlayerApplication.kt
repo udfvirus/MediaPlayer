@@ -21,11 +21,13 @@ import com.javavirys.mediaplayer.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class MediaPlayerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        setupTimber()
         startKoin {
             androidLogger()
             androidContext(this@MediaPlayerApplication)
@@ -40,6 +42,12 @@ class MediaPlayerApplication : Application() {
                     viewModelModule
                 )
             )
+        }
+    }
+
+    private fun setupTimber() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
     }
 }

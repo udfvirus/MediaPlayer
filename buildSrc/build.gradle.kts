@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ * Copyright 2021 Vitaliy Sychov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.javavirys.mediaplayer.core.entity
+plugins {
+    `kotlin-dsl`
+}
 
-import androidx.work.OneTimeWorkRequest
-
-data class Worker(
-    val workRequest: OneTimeWorkRequest
-)
+repositories {
+    mavenCentral()
+}

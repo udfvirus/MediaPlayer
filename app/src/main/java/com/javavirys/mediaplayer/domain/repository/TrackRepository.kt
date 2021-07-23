@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ * Copyright 2021 Vitaliy Sychov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.javavirys.mediaplayer.core.entity
+package com.javavirys.mediaplayer.domain.repository
 
-data class FileSystemTrack(
-    override val id: Long,
-    override val name: String = "",
-    val path: String = ""
-) : Track
+import com.javavirys.mediaplayer.core.entity.Track
+
+interface TrackRepository {
+
+    suspend fun getTrackById(id: Long)
+
+    suspend fun remove(track: Track)
+}

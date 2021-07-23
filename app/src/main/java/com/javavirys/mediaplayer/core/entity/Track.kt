@@ -16,7 +16,9 @@
 
 package com.javavirys.mediaplayer.core.entity
 
-interface Track {
-    val id: Long
-    val name: String
-}
+data class Track(
+    val id: Long,
+    val name: String = "",
+    val path: String = "",
+    var selected: Boolean = false
+)

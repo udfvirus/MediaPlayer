@@ -26,6 +26,6 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModel { SplashViewModel(get(), get()) }
     viewModel { MainViewModel(get()) }
-    viewModel { TrackListViewModel(get(), get()) }
+    viewModel { TrackListViewModel(get(), get(), get()) }
     viewModel { TrackViewModel(get()) }
 }

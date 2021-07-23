@@ -22,42 +22,67 @@ import com.javavirys.mediaplayer.data.worker.FileScannerWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.io.File
 
 class MediaStorage(database: AppDatabase) {
 
     private val trackDao = database.getTrackDao()
 
-    private var onReadyListener: ((List<MediaMetadataCompat>?) -> Unit) = {}
-
-    private var tracks: List<MediaMetadataCompat>? = null
+    private var state = State.STATE_CREATE
         set(value) {
-            synchronized(onReadyListener) {
+            if (value == State.STATE_INITIALIZED || value == State.STATE_ERROR) {
+                synchronized(onReadyListener) {
+                    field = value
+                    onReadyListener(value)
+                }
+            } else {
                 field = value
-                onReadyListener(value)
             }
         }
 
+    private var onReadyListener: ((State) -> Unit) = {}
+
     suspend fun load() {
+        state = State.STATE_INITIALIZING
         val trackDboList = trackDao.getTrackList()
-        tracks = if (trackDboList.isEmpty()) {
+        if (trackDboList.isEmpty()) {
             FileScannerWorker(trackDao).doWork()
             trackDao.getTrackList()
         } else {
             launchScannerUseGlobalScope()
             trackDboList
         }.map { TrackMapper().toMediaMetadataCompat(it) }
+        state = State.STATE_INITIALIZED
     }
 
     private fun launchScannerUseGlobalScope() {
         GlobalScope.launch(Dispatchers.IO) { FileScannerWorker(trackDao).doWork() }
     }
 
-    fun whenReady(performAction: (List<MediaMetadataCompat>?) -> Unit): Boolean =
-        if (tracks.isNullOrEmpty()) {
+    fun whenReady(performAction: (State) -> Unit): Boolean = when (state) {
+        State.STATE_CREATE, State.STATE_INITIALIZING -> {
             onReadyListener = performAction
             false
-        } else {
-            performAction(tracks)
+        }
+        else -> {
+            performAction(state)
             true
         }
+    }
+
+    fun getTrackList(): List<MediaMetadataCompat> {
+        return runBlocking {
+            trackDao.getTrackList()
+                .filter { File(it.filePath).exists() }
+                .map { TrackMapper().toMediaMetadataCompat(it) }
+        }
+    }
+
+    enum class State {
+        STATE_CREATE,
+        STATE_INITIALIZING,
+        STATE_INITIALIZED,
+        STATE_ERROR
+    }
 }
