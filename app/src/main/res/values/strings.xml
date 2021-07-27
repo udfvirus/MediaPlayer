@@ -13,6 +13,7 @@
 
     <!-- TrackList -->
     <string name="track_list_progress_title">Wait a while the file system is scanned for music</string>
+    <string name="track_list_no_files_found">Files not found!</string>
     <string name="unknown_artist">Unknown artist</string>
     <string name="menu_delete">Delete</string>
 
