@@ -36,4 +36,14 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
 
+    <include
+        android:id="@+id/noFilesFoundLayout"
+        layout="@layout/layout_no_files_found"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

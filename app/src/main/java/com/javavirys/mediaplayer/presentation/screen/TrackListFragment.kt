@@ -63,6 +63,8 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     private lateinit var progressLayout: ConstraintLayout
 
+    private lateinit var noFilesFoundLayout: View
+
     private lateinit var playingLayout: CardView
 
     private lateinit var coverImageView: ImageView
@@ -95,6 +97,7 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressLayout = view.findView(R.id.progressLayout)
+        noFilesFoundLayout = view.findView(R.id.noFilesFoundLayout)
         initToolbar()
         initRecyclerView(view)
         initPlayingLayout(view)
@@ -113,6 +116,7 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
             if (it is Result.Success) {
                 adapter.addItem(it.data)
             }
+            showNoFilesLayoutIfNeed()
         }
         model.scannerStatusLiveData.observe(viewLifecycleOwner) {
             when (it) {
@@ -141,6 +145,10 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
             adapter.deselectAllItems()
             model.selectedModeTrackLiveData.value = false
         }
+    }
+
+    private fun showNoFilesLayoutIfNeed() {
+        noFilesFoundLayout.isVisible = adapter.itemCount != 0
     }
 
     private fun initPlayingLayout(view: View) {
