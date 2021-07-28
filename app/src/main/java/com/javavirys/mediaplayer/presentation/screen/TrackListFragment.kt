@@ -37,6 +37,7 @@ import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.core.entity.Result
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.presentation.adapter.TrackAdapter
+import com.javavirys.mediaplayer.presentation.dialog.ConfirmOperationDialog
 import com.javavirys.mediaplayer.presentation.viewmodel.MainSharedViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
@@ -216,8 +217,12 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.deleteMenuItem -> {
-            println("test: onOptionsItemSelected =  R.id.deleteMenuItem")
-            model.deleteSelectedTracks()
+            ConfirmOperationDialog(
+                getString(R.string.track_list_delete_track_msg),
+                onConfirmed = {
+                    model.deleteSelectedTracks()
+                }
+            ).show(parentFragmentManager)
             true
         }
         else -> super.onOptionsItemSelected(item)
