@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import com.javavirys.mediaplayer.R
 
 class ConfirmOperationDialog(
+    private val title: String,
     private val message: String,
     private val onConfirmed: () -> Unit = {},
     private val onCanceled: () -> Unit = {}
@@ -30,6 +31,7 @@ class ConfirmOperationDialog(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             AlertDialog.Builder(it)
+                .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(R.string.confirm) { _, _ ->
                     onConfirmed()

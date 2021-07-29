@@ -58,6 +58,22 @@ abstract class BaseViewModel : ViewModel() {
 
     protected fun <R> launch(
         backgroundCode: suspend () -> R,
+        liveData: MutableLiveData<R>,
+        catchCode: (throwable: Throwable) -> Unit = ::onException,
+        backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,
+        foregroundDispatcher: CoroutineDispatcher = Dispatchers.Main
+    ) {
+        launch(
+            backgroundCode,
+            foregroundCode = { liveData.value = it },
+            catchCode,
+            backgroundDispatcher,
+            foregroundDispatcher
+        )
+    }
+
+    protected fun <R> launch(
+        backgroundCode: suspend () -> R,
         foregroundCode: (result: R) -> Unit = {},
         catchCode: (throwable: Throwable) -> Unit = ::onException,
         backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,

@@ -19,6 +19,7 @@ import android.support.v4.media.MediaBrowserCompat
 import androidx.lifecycle.MutableLiveData
 import com.javavirys.mediaplayer.core.entity.Result
 import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.core.exception.TrackNotFoundException
 import com.javavirys.mediaplayer.data.service.MediaPlaybackService.Companion.ROOT_ID
 import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInteractor
 import com.javavirys.mediaplayer.presentation.navigation.MainRouter
@@ -51,6 +52,9 @@ class TrackListViewModel(
         ) {
 
             scannerStatusLiveData.value = Result.Success(Unit)
+            if (children.isEmpty()) {
+                tracksLiveData.value = Result.Error(TrackNotFoundException())
+            }
             children.map { child ->
                 tracksLiveData.value =
                     Result.Success(
@@ -91,6 +95,14 @@ class TrackListViewModel(
     fun navigateToTrackScreen(track: Track) {
         playMedia(track, false)
         router.navigateToTrackScreen(track)
+    }
+
+    fun navigateToTrackInformationScreen() {
+        selectedTrackListLiveData.value?.let {
+            it.forEach { item -> item.selected = false }
+            selectedModeTrackLiveData.value = false
+            router.navigateToTrackInformationScreen(it)
+        }
     }
 
     private fun playMedia(mediaItem: Track, pauseAllowed: Boolean = true) {

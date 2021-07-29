@@ -16,13 +16,13 @@
 
 package com.javavirys.mediaplayer.di
 
-import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInDBInteractor
-import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInFileSystemInteractor
-import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInteractor
+import com.javavirys.mediaplayer.domain.interactor.*
 import org.koin.dsl.module
 
 val interactorModule = module {
     single { DeleteTrackInDBInteractor(get()) }
     single { DeleteTrackInFileSystemInteractor() }
     single { DeleteTrackInteractor(get(), get()) }
+    single { GetTrackInformationFromFileSystemInteractor() }
+    single { GetTrackInformationsFromFileSystemInteractor(get()) }
 }

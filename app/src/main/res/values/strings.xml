@@ -9,6 +9,10 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Menu -->
+    <string name="menu_delete">Delete</string>
+    <string name="menu_information">Information</string>
+
     <!-- Notificaiton Channel -->
     <string name="notification_channel">Now Playing</string>
     <string name="notification_channel_description">Shows what music is currently playing in UAMP</string>
@@ -17,7 +21,11 @@
     <string name="track_list_progress_title">Wait a while the file system is scanned for music</string>
     <string name="track_list_no_files_found">Files not found!</string>
     <string name="unknown_artist">Unknown artist</string>
-    <string name="menu_delete">Delete</string>
-    <string name="track_list_delete_track_msg">Are you sure you want to delete the track?</string>
+    <string name="track_list_delete_track_title">Delete tracks?</string>
+    <string name="track_list_delete_track_msg">Are you sure you want to delete the selected tracks?</string>
+
+    <!-- TrackInformation -->
+    <string name="track_information_files">Files:</string>
+    <string name="track_information_size">Size:</string>
 
 </resources>

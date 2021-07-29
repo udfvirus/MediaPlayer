@@ -16,9 +16,13 @@
 
 package com.javavirys.mediaplayer.core.entity
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Track(
     val id: Long,
     val name: String = "",
     val path: String = "",
     var selected: Boolean = false
-)
+) : Parcelable

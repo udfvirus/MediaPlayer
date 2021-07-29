@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
@@ -116,8 +117,9 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         model.tracksLiveData.observe(viewLifecycleOwner) {
             if (it is Result.Success) {
                 adapter.addItem(it.data)
+            } else {
+                showNoFilesLayoutIfNeed()
             }
-            showNoFilesLayoutIfNeed()
         }
         model.scannerStatusLiveData.observe(viewLifecycleOwner) {
             when (it) {
@@ -149,6 +151,7 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     }
 
     private fun showNoFilesLayoutIfNeed() {
+        println("test: adapter.itemCount: ${adapter.itemCount}")
         noFilesFoundLayout.isVisible = adapter.itemCount == 0
     }
 
@@ -218,11 +221,14 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.deleteMenuItem -> {
             ConfirmOperationDialog(
+                getString(R.string.track_list_delete_track_title),
                 getString(R.string.track_list_delete_track_msg),
-                onConfirmed = {
-                    model.deleteSelectedTracks()
-                }
+                model::deleteSelectedTracks
             ).show(parentFragmentManager)
+            true
+        }
+        R.id.informationMenuItem -> {
+            model.navigateToTrackInformationScreen()
             true
         }
         else -> super.onOptionsItemSelected(item)
