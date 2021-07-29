@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Vitaliy Sychov. All rights reserved.
+ * Copyright 2021 Vitaliy Sychov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.javavirys.mediaplayer.di
+package com.javavirys.mediaplayer.domain.interactor
 
-import com.javavirys.mediaplayer.presentation.viewmodel.*
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import com.javavirys.mediaplayer.core.entity.TrackInformation
+import java.io.File
 
-val viewModelModule = module {
-    viewModel { SplashViewModel(get(), get()) }
-    viewModel { MainViewModel(get()) }
-    viewModel { TrackListViewModel(get(), get(), get()) }
-    viewModel { TrackViewModel(get()) }
-    viewModel { TrackInformationViewModel(get()) }
+class GetTrackInformationFromFileSystemInteractor : Interactor<String, TrackInformation> {
+
+    override suspend fun execute(param: String): TrackInformation {
+        val file = File(param)
+        return TrackInformation(
+            param,
+            file.length()
+        )
+    }
 }

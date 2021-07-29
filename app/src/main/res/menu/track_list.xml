@@ -22,4 +22,11 @@
         android:icon="@drawable/ic_baseline_delete_24"
         android:title="@string/menu_delete"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/informationMenuItem"
+        android:icon="@drawable/ic_baseline_info_24"
+        android:title="@string/menu_information"
+        app:showAsAction="ifRoom" />
+
 </menu>

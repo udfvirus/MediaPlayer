@@ -30,4 +30,13 @@ class MainRouter(private val activityProvider: ActivityProvider) {
             ?.findNavController(R.id.fragmentContainer)
             ?.navigate(action)
     }
+
+    fun navigateToTrackInformationScreen(tracks: List<Track>) {
+        val action =
+            TrackListFragmentDirections.actionTrackListFragmentToTrackInformationFragment(tracks.toTypedArray())
+
+        activityProvider.activeActivity
+            ?.findNavController(R.id.fragmentContainer)
+            ?.navigate(action)
+    }
 }

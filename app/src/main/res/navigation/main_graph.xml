@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_trackListFragment_to_trackFragment"
             app:destination="@id/trackFragment" />
+        <action
+            android:id="@+id/action_trackListFragment_to_trackInformationFragment"
+            app:destination="@id/trackInformationFragment" />
     </fragment>
 
     <fragment
@@ -23,6 +26,16 @@
         <argument
             android:name="trackId"
             app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/trackInformationFragment"
+        android:name="com.javavirys.mediaplayer.presentation.screen.TrackInformationFragment"
+        android:label="TrackInformationFragment"
+        tools:layout="@layout/fragment_track_information">
+        <argument
+            android:name="tracks"
+            app:argType="com.javavirys.mediaplayer.core.entity.Track[]" />
     </fragment>
 
 </navigation>
