@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.javavirys.mediaplayer.core.entity
+package com.javavirys.mediaplayer.di
 
-import android.net.Uri
+import android.content.Context
+import android.content.SharedPreferences
+import org.koin.dsl.module
 
-data class PlayingMetadata(
-    val id: String,
-    val albumArtUri: Uri?,
-    val title: String?,
-    val subtitle: String?,
-    val duration: String?,
-    val durationMsec: Long
-)
+
+val preferencesModule = module {
+
+    single { getPreferences(get()) }
+}
+
+fun getPreferences(context: Context): SharedPreferences =
+    context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+
+private const val PREFERENCES_NAME = "current_track_preferences"

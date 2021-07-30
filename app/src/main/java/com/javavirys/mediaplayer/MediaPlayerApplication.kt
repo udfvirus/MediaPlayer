@@ -39,7 +39,8 @@ class MediaPlayerApplication : Application() {
                     repositoryModule,
                     interactorModule,
                     navigationModule,
-                    viewModelModule
+                    viewModelModule,
+                    preferencesModule
                 )
             )
         }
