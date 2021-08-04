@@ -18,14 +18,11 @@ package com.javavirys.mediaplayer.data.service
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.*
@@ -41,12 +38,16 @@ import com.google.android.gms.cast.MediaQueueItem
 import com.google.android.gms.cast.framework.CastContext
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.data.mapper.MediaMetadataMapper
+import com.javavirys.mediaplayer.data.service.listener.MediaPlaybackPreparer
+import com.javavirys.mediaplayer.data.service.listener.MediaPlayerEventListener
 import com.javavirys.mediaplayer.di.DatabaseFactory
+import com.javavirys.mediaplayer.di.getPreferences
 import com.javavirys.mediaplayer.util.extension.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MediaPlaybackService : MediaBrowserServiceCompat() {
 
@@ -65,7 +66,12 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         .setUsage(C.USAGE_MEDIA)
         .build()
 
-    private val playerListener = PlayerEventListener()
+    private val playerListener = MediaPlayerEventListener(
+        onShowNotificationForPlayer = { notificationManager.showNotificationForPlayer(currentPlayer) },
+        onHideNotificationForPlayer = { notificationManager.hideNotification() },
+        ::stopForegroundService,
+        ::saveRecentSongToStorage
+    )
 
     private val exoPlayer: ExoPlayer by lazy {
         SimpleExoPlayer.Builder(this).build().apply {
@@ -79,11 +85,11 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         try {
             val castContext = CastContext.getSharedInstance(this)
             CastPlayer(castContext).apply {
-                setSessionAvailabilityListener(UampCastSessionAvailabilityListener())
+                setSessionAvailabilityListener(MediaCastSessionAvailabilityListener())
                 addListener(playerListener)
             }
         } catch (e: Exception) {
-            println(
+            Timber.e(
                 "Cast is not available on this device. " +
                         "Exception thrown when attempting to obtain CastContext. " + e.message
             )
@@ -106,6 +112,8 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     private val mediaStorage by lazy {
         MediaStorage(DatabaseFactory.getDatabaseInstance(applicationContext))
     }
+
+    private val persistentStorage by lazy { PersistentStorage(getPreferences(baseContext)) }
 
     override fun onCreate() {
         super.onCreate()
@@ -137,7 +145,12 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
 
         mediaSessionConnector = MediaSessionConnector(mediaSession)
-        mediaSessionConnector.setPlaybackPreparer(UampPlaybackPreparer())
+        mediaSessionConnector.setPlaybackPreparer(
+            MediaPlaybackPreparer(
+                mediaStorage,
+                ::preparePlaylist
+            )
+        )
         mediaSessionConnector.setQueueNavigator(UampQueueNavigator(mediaSession))
 
         switchToPlayer(
@@ -200,6 +213,8 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
+
+
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
@@ -213,16 +228,18 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
     override fun onLoadChildren(
         parentId: String,
-        result: Result<MutableList<MediaBrowserCompat.MediaItem>>
+        result: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
-        if (parentId == ROOT_ID) {
-            sendResultForRootId(result)
-        } else {
-            result.sendResult(null)
+        when (parentId) {
+            ROOT_ID -> sendResultForRootId(result)
+            RECENT_ID -> {
+                result.sendResult(persistentStorage.loadRecentSong()?.let { song -> listOf(song) })
+            }
+            else -> result.sendResult(null)
         }
     }
 
-    private fun sendResultForRootId(result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
+    private fun sendResultForRootId(result: Result<List<MediaBrowserCompat.MediaItem>>) {
         val resultsSent = mediaStorage.whenReady {
             val mediaItems = mutableListOf<MediaBrowserCompat.MediaItem>()
 
@@ -236,6 +253,12 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        saveRecentSongToStorage()
+        super.onTaskRemoved(rootIntent)
+        currentPlayer.stop(true)
+    }
+
     override fun onDestroy() {
         serviceJob.cancel()
 
@@ -243,69 +266,23 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         exoPlayer.release()
     }
 
+    private fun stopForegroundService(removeNotification: Boolean) {
+        stopForeground(removeNotification)
+        isForegroundService = false
+    }
 
-    private inner class UampPlaybackPreparer : MediaSessionConnector.PlaybackPreparer {
+    private fun saveRecentSongToStorage() {
+        val description = currentPlaylistItems[currentPlayer.currentWindowIndex].description
+        val position = currentPlayer.currentPosition
 
-        override fun onCommand(
-            player: Player,
-            controlDispatcher: ControlDispatcher,
-            command: String,
-            extras: Bundle?,
-            cb: ResultReceiver?
-        ): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun getSupportedPrepareActions(): Long =
-            PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID or
-                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
-                    PlaybackStateCompat.ACTION_PREPARE_FROM_SEARCH or
-                    PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-
-        override fun onPrepare(playWhenReady: Boolean) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepareFromMediaId(
-            mediaId: String,
-            playWhenReady: Boolean,
-            extras: Bundle?
-        ) {
-            // MediaId
-            val tracks = mediaStorage.getTrackList()
-
-            val itemToPlay = tracks.find { item ->
-                item.id.toString() == mediaId
-            }
-            if (itemToPlay == null) {
-//                Log.w(TAG, "Content not found: MediaID=$mediaId")
-                // TODO: Notify caller of the error.
-            } else {
-                val playbackStartPositionMs = extras?.getLong(
-                    MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS,
-                    C.TIME_UNSET
-                ) ?: C.TIME_UNSET
-                preparePlaylist(
-                    tracks,
-                    itemToPlay,
-                    playWhenReady,
-                    playbackStartPositionMs
-                )
-            }
-        }
-
-        override fun onPrepareFromSearch(
-            query: String,
-            playWhenReady: Boolean,
-            extras: Bundle?
-        ) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
-            TODO("Not yet implemented")
+        serviceScope.launch {
+            persistentStorage.saveRecentSong(
+                description,
+                position
+            )
         }
     }
+
 
     private inner class PlayerNotificationListener :
         PlayerNotificationManager.NotificationListener {
@@ -327,8 +304,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
 
         override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-            stopForeground(true)
-            isForegroundService = false
+            stopForegroundService(true)
             stopSelf()
         }
     }
@@ -341,32 +317,12 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             player: Player,
             windowIndex: Int
         ): MediaDescriptionCompat {
+            Timber.d("UampQueueNavigator.getMediaDescription.currentPlaylistItems[$windowIndex].description = ${currentPlaylistItems[windowIndex].description}")
             return currentPlaylistItems[windowIndex].description
         }
     }
 
-    private inner class PlayerEventListener : Player.EventListener {
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            when (playbackState) {
-                Player.STATE_BUFFERING,
-                Player.STATE_READY -> {
-                    notificationManager.showNotificationForPlayer(currentPlayer)
-                    if (playbackState == Player.STATE_READY) {
-//                        saveRecentSongToStorage()
-                        if (!playWhenReady) {
-                            stopForeground(false)
-                            isForegroundService = false
-                        }
-                    }
-                }
-                else -> {
-                    notificationManager.hideNotification()
-                }
-            }
-        }
-    }
-
-    private inner class UampCastSessionAvailabilityListener : SessionAvailabilityListener {
+    private inner class MediaCastSessionAvailabilityListener : SessionAvailabilityListener {
 
         override fun onCastSessionAvailable() {
             switchToPlayer(currentPlayer, castPlayer!!)
@@ -379,14 +335,8 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
     companion object {
 
-        const val UAMP_RECOMMENDED_ROOT = "__RECOMMENDED__"
-        const val UAMP_ALBUMS_ROOT = "__ALBUMS__"
-
-        const val RESOURCE_ROOT_URI =
-            "android.resource://com.example.android.uamp.next/drawable/"
-
         const val ROOT_ID = "/"
 
-        const val MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS = "playback_start_position_ms"
+        const val RECENT_ID = "/RECENT_ID"
     }
 }

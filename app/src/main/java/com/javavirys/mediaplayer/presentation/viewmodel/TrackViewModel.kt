@@ -17,18 +17,22 @@ package com.javavirys.mediaplayer.presentation.viewmodel
 
 import android.os.Handler
 import android.os.Looper
+import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
+import com.javavirys.mediaplayer.core.entity.Track
+import com.javavirys.mediaplayer.data.service.MediaPlaybackService.Companion.RECENT_ID
 import com.javavirys.mediaplayer.util.MusicServiceConnection
 import com.javavirys.mediaplayer.util.MusicServiceConnection.Companion.EMPTY_PLAYBACK_STATE
 import com.javavirys.mediaplayer.util.MusicServiceConnection.Companion.NOTHING_PLAYING
 import com.javavirys.mediaplayer.util.PlayerUtils
 import com.javavirys.mediaplayer.util.TimeUtils
 import com.javavirys.mediaplayer.util.extension.*
+import timber.log.Timber
 
 class TrackViewModel(
     musicServiceConnection: MusicServiceConnection
@@ -53,7 +57,36 @@ class TrackViewModel(
 
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
 
+    private val recentSubscriptionCallback = object : MediaBrowserCompat.SubscriptionCallback() {
+
+        override fun onChildrenLoaded(
+            parentId: String,
+            children: List<MediaBrowserCompat.MediaItem>
+        ) {
+            if (children.isEmpty()) return
+
+            children.map { child ->
+                val track = Track(
+                    child.mediaId!!.toLong(),
+                    child.description.title.toString(),
+                    child.description.mediaUri.toString()
+                )
+                Timber.d("recentSubscriptionCallback.onChildrenLoaded.track = $track")
+                if (mediaMetadata.value?.id == child.mediaId) return
+                mediaMetadata.value = PlayingMetadata(
+                    child.mediaId!!,
+                    child.description.iconUri,
+                    child.description.title.toString(),
+                    null,
+                    null,
+                    0
+                )
+            }
+        }
+    }
+
     private val musicServiceConnection = musicServiceConnection.also {
+        it.subscribe(RECENT_ID, recentSubscriptionCallback)
         it.playbackState.observeForever(playbackStateObserver)
         it.nowPlaying.observeForever(mediaMetadataObserver)
         checkPlaybackPosition()
@@ -76,6 +109,7 @@ class TrackViewModel(
         musicServiceConnection.playbackState.removeObserver(playbackStateObserver)
         musicServiceConnection.nowPlaying.removeObserver(mediaMetadataObserver)
         updatePosition = false
+        musicServiceConnection.unsubscribe(RECENT_ID, recentSubscriptionCallback)
     }
 
     private fun checkPlaybackPosition(): Boolean = handler.postDelayed({
