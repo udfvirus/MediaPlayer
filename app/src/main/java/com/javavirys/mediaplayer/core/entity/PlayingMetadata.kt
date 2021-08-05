@@ -24,5 +24,6 @@ data class PlayingMetadata(
     val title: String?,
     val subtitle: String?,
     val duration: String?,
-    val durationMsec: Long
+    val durationMsec: Long,
+    var isPlaying: PlayingStatus = PlayingStatus.STATE_STOP
 )
