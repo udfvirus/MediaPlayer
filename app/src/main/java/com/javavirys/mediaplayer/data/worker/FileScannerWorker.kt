@@ -15,6 +15,7 @@
  */
 package com.javavirys.mediaplayer.data.worker
 
+import android.media.MediaMetadataRetriever
 import android.os.Environment
 import com.javavirys.mediaplayer.data.database.dao.TrackDao
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
@@ -54,7 +55,12 @@ class FileScannerWorker(private val trackDao: TrackDao) {
         when (file.extension) {
             "mp3" -> {
                 try {
-                    trackDao.insert(TrackDbo(0, file.path, file.nameWithoutExtension))
+                    val mediaMetadataRetriever = MediaMetadataRetriever()
+                    mediaMetadataRetriever.setDataSource(file.path)
+                    val artist =
+                        mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                            ?: "Unknown artist"
+                    trackDao.insert(TrackDbo(0, file.path, file.nameWithoutExtension, artist))
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                 }

@@ -75,7 +75,8 @@ class TrackViewModel(
                 val track = Track(
                     child.mediaId!!.toLong(),
                     child.description.title.toString(),
-                    child.description.mediaUri.toString()
+                    child.description.mediaUri.toString(),
+                    child.description.subtitle.toString()
                 )
                 Timber.d("recentSubscriptionCallback.onChildrenLoaded.track = $track")
                 if (mediaMetadata.value?.id == child.mediaId) return
@@ -83,7 +84,7 @@ class TrackViewModel(
                     child.mediaId!!,
                     child.description.iconUri,
                     child.description.title.toString(),
-                    null,
+                    child.description.subtitle.toString(),
                     null,
                     0,
                     PlayingStatus.STATE_PAUSED

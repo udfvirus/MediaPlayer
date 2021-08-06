@@ -33,7 +33,7 @@ class PlayingMetadataMapper {
             mediaMetadata.id!!,
             mediaMetadata.albumArtUri,
             mediaMetadata.title?.trim(),
-            mediaMetadata.displaySubtitle?.trim(),
+            mediaMetadata.description.subtitle.toString().trim(),
             TimeUtils.timestampToMSS(mediaMetadata.duration),
             mediaMetadata.duration,
             transformPlaybackStateCompatToPlayingStatus(playbackState)

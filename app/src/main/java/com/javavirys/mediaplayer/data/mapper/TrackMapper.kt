@@ -19,21 +19,24 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
-import com.javavirys.mediaplayer.util.extension.flag
-import com.javavirys.mediaplayer.util.extension.id
-import com.javavirys.mediaplayer.util.extension.mediaUri
-import com.javavirys.mediaplayer.util.extension.title
+import com.javavirys.mediaplayer.util.extension.*
 
 class TrackMapper {
 
-    fun toTrack(trackDbo: TrackDbo): Track = Track(trackDbo.id, trackDbo.name, trackDbo.filePath)
+    fun toTrack(trackDbo: TrackDbo): Track = Track(
+        trackDbo.id,
+        trackDbo.name,
+        trackDbo.filePath,
+        trackDbo.artist
+    )
 
-    fun toTrackDbo(track: Track) = TrackDbo(track.id, track.name, track.path)
+    fun toTrackDbo(track: Track) = TrackDbo(track.id, track.name, track.path, track.artist)
 
     fun toMediaMetadataCompat(trackDbo: TrackDbo): MediaMetadataCompat =
         MediaMetadataCompat.Builder().apply {
             id = trackDbo.id.toString()
             title = trackDbo.name
+            artist = trackDbo.artist
             mediaUri = trackDbo.filePath
 //        albumArtUri = MediaPlaybackService.RESOURCE_ROOT_URI +
 //                resources.getResourceEntryName(R.drawable.ic_recommended)

@@ -229,8 +229,8 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         nameTextView.text = metadata.title
         nameTextView.isFocusableInTouchMode = true
         nameTextView.requestFocus()
-        nameTextView.marqueeRepeatLimit = -1;
-        singerTextView.text = getString(R.string.unknown_artist)
+        nameTextView.marqueeRepeatLimit = -1
+        singerTextView.text = metadata.subtitle
     }
 
     private fun hideProgress() {
