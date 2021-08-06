@@ -92,4 +92,13 @@ class TrackAdapter(
             notifyItemChanged(index)
         }
     }
+
+    fun getItemIndexById(id: Long): Int {
+        items.forEachIndexed { index, track ->
+            if (id == track.id) {
+                return index
+            }
+        }
+        return 0
+    }
 }
