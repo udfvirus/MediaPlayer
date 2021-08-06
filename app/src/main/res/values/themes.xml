@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <!--        <item name="android:background">@color/ic_launcher_background</item>-->
+        <!--        <item name="android:textColor">@color/exo_white_opacity_70</item>-->
     </style>
 
     <style name="Theme.MediaPlayer.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
