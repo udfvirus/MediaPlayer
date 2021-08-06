@@ -213,8 +213,6 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
-
-
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,

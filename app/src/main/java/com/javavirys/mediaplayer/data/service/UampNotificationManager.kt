@@ -123,7 +123,7 @@ class UampNotificationManager(
 
         private const val NOTIFICATION_LARGE_ICON_SIZE = 144 // px
 
-        private const val NOW_PLAYING_CHANNEL_ID = "com.example.android.uamp.media.NOW_PLAYING"
+        private const val NOW_PLAYING_CHANNEL_ID = "com.javavirys.mediaplayer.media.NOW_PLAYING"
 
         private const val NOW_PLAYING_NOTIFICATION_ID = 0xb339
     }
