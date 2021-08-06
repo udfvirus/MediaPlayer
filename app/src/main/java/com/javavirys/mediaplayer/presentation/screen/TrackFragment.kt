@@ -16,6 +16,7 @@
 package com.javavirys.mediaplayer.presentation.screen
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatSeekBar
@@ -27,6 +28,7 @@ import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
+import com.javavirys.mediaplayer.util.extension.getTitleTextView
 import com.javavirys.mediaplayer.util.extension.setOnProgressChanged
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -50,6 +52,13 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbar.getTitleTextView()?.let {
+            it.ellipsize = TextUtils.TruncateAt.MARQUEE;
+            it.isFocusableInTouchMode = true;
+            it.requestFocus();
+            it.isSingleLine = true;
+            it.marqueeRepeatLimit = -1;
+        }
         initViews(view)
         initClickListeners()
         initObservers(view)

@@ -227,6 +227,9 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
     private fun updatePlayingLayout(metadata: PlayingMetadata) {
         playingLayout.isVisible = true
         nameTextView.text = metadata.title
+        nameTextView.isFocusableInTouchMode = true
+        nameTextView.requestFocus()
+        nameTextView.marqueeRepeatLimit = -1;
         singerTextView.text = getString(R.string.unknown_artist)
     }
 

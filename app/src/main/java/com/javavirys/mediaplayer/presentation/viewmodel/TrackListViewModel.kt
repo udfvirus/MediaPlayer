@@ -93,6 +93,10 @@ class TrackListViewModel(
     }
 
     fun navigateToTrackScreen(track: Track) {
+        selectedTrackListLiveData.value?.let {
+            it.forEach { item -> item.selected = false }
+            selectedModeTrackLiveData.value = false
+        }
         playMedia(track, false)
         router.navigateToTrackScreen(track)
     }
