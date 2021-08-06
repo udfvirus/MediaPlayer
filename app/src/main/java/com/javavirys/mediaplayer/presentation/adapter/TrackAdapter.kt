@@ -19,6 +19,7 @@ package com.javavirys.mediaplayer.presentation.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.javavirys.mediaplayer.R
+import com.javavirys.mediaplayer.core.entity.PlayingStatus
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.util.extension.inflate
 
@@ -35,9 +36,8 @@ class TrackAdapter(
         onItemLongClick
     )
 
-    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) =
         holder.bind(items[position])
-    }
 
     override fun getItemCount() = items.size
 
@@ -77,6 +77,19 @@ class TrackAdapter(
                 break
             }
             index++
+        }
+    }
+
+    fun setPlayingStatus(track: Track) {
+        items.forEachIndexed { index, it ->
+            if (it.id == track.id) {
+                if (track.playingStatus == it.playingStatus) return@forEachIndexed
+                it.playingStatus = track.playingStatus
+            } else {
+                if (it.playingStatus == PlayingStatus.STATE_STOP) return@forEachIndexed
+                it.playingStatus = PlayingStatus.STATE_STOP
+            }
+            notifyItemChanged(index)
         }
     }
 }

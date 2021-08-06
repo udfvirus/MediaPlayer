@@ -24,14 +24,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
+import com.javavirys.mediaplayer.core.entity.PlayingStatus
 import com.javavirys.mediaplayer.core.entity.Track
 import com.javavirys.mediaplayer.data.service.MediaPlaybackService.Companion.RECENT_ID
+import com.javavirys.mediaplayer.presentation.mapper.PlayingMetadataMapper
 import com.javavirys.mediaplayer.util.MusicServiceConnection
 import com.javavirys.mediaplayer.util.MusicServiceConnection.Companion.EMPTY_PLAYBACK_STATE
 import com.javavirys.mediaplayer.util.MusicServiceConnection.Companion.NOTHING_PLAYING
 import com.javavirys.mediaplayer.util.PlayerUtils
-import com.javavirys.mediaplayer.util.TimeUtils
-import com.javavirys.mediaplayer.util.extension.*
+import com.javavirys.mediaplayer.util.extension.currentPlayBackPosition
+import com.javavirys.mediaplayer.util.extension.duration
+import com.javavirys.mediaplayer.util.extension.id
+import com.javavirys.mediaplayer.util.extension.isPlaying
 import timber.log.Timber
 
 class TrackViewModel(
@@ -44,6 +48,8 @@ class TrackViewModel(
 
     val mediaMetadata = MutableLiveData<PlayingMetadata>()
     val mediaButtonRes = MutableLiveData<Pair<Boolean, Int>>()
+    val nowPlayingLiveData = MutableLiveData<PlayingMetadata>()
+
 
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it ?: EMPTY_PLAYBACK_STATE
@@ -79,8 +85,10 @@ class TrackViewModel(
                     child.description.title.toString(),
                     null,
                     null,
-                    0
+                    0,
+                    PlayingStatus.STATE_PAUSED
                 )
+                nowPlayingLiveData.value = mediaMetadata.value
             }
         }
     }
@@ -126,15 +134,11 @@ class TrackViewModel(
         playbackState: PlaybackStateCompat,
         mediaMetadata: MediaMetadataCompat
     ) {
+        Timber.d("updateState.mediaMetadata duration=${mediaMetadata.duration}&&id=${mediaMetadata.id}")
         if (mediaMetadata.duration != 0L && mediaMetadata.id != null) {
-            val nowPlayingMetadata = PlayingMetadata(
-                mediaMetadata.id!!,
-                mediaMetadata.albumArtUri,
-                mediaMetadata.title?.trim(),
-                mediaMetadata.displaySubtitle?.trim(),
-                TimeUtils.timestampToMSS(mediaMetadata.duration),
-                mediaMetadata.duration
-            )
+            val nowPlayingMetadata = PlayingMetadataMapper()
+                .toPlayingMetadata(mediaMetadata, playbackState)
+
             this.mediaMetadata.postValue(nowPlayingMetadata)
         }
 
@@ -143,6 +147,21 @@ class TrackViewModel(
             else -> R.drawable.ic_play_arrow_black_24dp
         }
         mediaButtonRes.postValue(Pair(playbackState.isPlaying, resourceId))
+        if (!mediaMetadata.id.isNullOrEmpty()) {
+            nowPlayingLiveData.postValue(
+                PlayingMetadata(
+                    mediaMetadata.id!!,
+                    null,
+                    null,
+                    null,
+                    null,
+                    0,
+                    PlayingMetadataMapper().transformPlaybackStateCompatToPlayingStatus(
+                        playbackState
+                    )
+                )
+            )
+        }
     }
 
     fun playMediaId(mediaId: String) {

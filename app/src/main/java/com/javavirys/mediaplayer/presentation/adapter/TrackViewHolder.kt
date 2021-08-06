@@ -21,8 +21,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.javavirys.mediaplayer.R
+import com.javavirys.mediaplayer.core.entity.PlayingStatus
 import com.javavirys.mediaplayer.core.entity.Track
 
 class TrackViewHolder(
@@ -30,6 +33,8 @@ class TrackViewHolder(
     private val onItemClick: (item: Track) -> Unit,
     private val onItemLongClick: (item: Track) -> Unit
 ) : RecyclerView.ViewHolder(view) {
+
+    private var currPlayingStatus: PlayingStatus? = null
 
     private val nameTextView by lazy {
         ViewCompat.requireViewById<TextView>(
@@ -52,6 +57,13 @@ class TrackViewHolder(
         )
     }
 
+    private val playVisualization by lazy {
+        ViewCompat.requireViewById<LottieAnimationView>(
+            itemView,
+            R.id.playVisualization
+        )
+    }
+
     fun bind(item: Track) {
         itemView.setOnClickListener { onItemClick(item) }
         itemView.setOnLongClickListener {
@@ -60,5 +72,19 @@ class TrackViewHolder(
         }
         nameTextView.text = item.name
         circleCheckBox.isChecked = item.selected
+
+        processPlayingStatus(item.playingStatus)
+    }
+
+    private fun processPlayingStatus(playingStatus: PlayingStatus) {
+        if (currPlayingStatus == playingStatus) return
+        currPlayingStatus = playingStatus
+
+        playVisualization.isVisible = playingStatus != PlayingStatus.STATE_STOP
+        when (playingStatus) {
+            PlayingStatus.STATE_PLAYING -> playVisualization.playAnimation()
+            PlayingStatus.STATE_PAUSED -> playVisualization.pauseAnimation()
+            PlayingStatus.STATE_STOP -> playVisualization.cancelAnimation()
+        }
     }
 }

@@ -32,6 +32,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
 import com.javavirys.mediaplayer.R
 import com.javavirys.mediaplayer.core.entity.PlayingMetadata
@@ -44,7 +45,6 @@ import com.javavirys.mediaplayer.presentation.viewmodel.TrackListViewModel
 import com.javavirys.mediaplayer.presentation.viewmodel.TrackViewModel
 import com.javavirys.mediaplayer.util.extension.findView
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_track_list) {
 
@@ -112,10 +112,12 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
 
     private fun initRecyclerView(view: View) {
         trackRecyclerView = view.findView(R.id.trackRecyclerView)
+        (trackRecyclerView.itemAnimator as SimpleItemAnimator).changeDuration = 0
         trackRecyclerView.adapter = adapter
 
         model.tracksLiveData.observe(viewLifecycleOwner) {
             if (it is Result.Success) {
+                changePlayingStatusIfNeed(it.data)
                 adapter.addItem(it.data)
             } else {
                 showNoFilesLayoutIfNeed()
@@ -150,8 +152,15 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         }
     }
 
+    private fun changePlayingStatusIfNeed(data: Track) {
+        trackViewModel.nowPlayingLiveData.value?.let { playingMetadata ->
+            if (data.id.toString() == playingMetadata.id) {
+                data.playingStatus = playingMetadata.isPlaying
+            }
+        }
+    }
+
     private fun showNoFilesLayoutIfNeed() {
-        println("test: adapter.itemCount: ${adapter.itemCount}")
         noFilesFoundLayout.isVisible = adapter.itemCount == 0
     }
 
@@ -159,9 +168,7 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         initPlayingLayoutViews(view)
         initPlayingLayoutListeners()
 
-        trackViewModel.mediaMetadata.observe(viewLifecycleOwner) {
-            updatePlayingLayout(it)
-        }
+        trackViewModel.mediaMetadata.observe(viewLifecycleOwner) { updatePlayingLayout(it) }
         trackViewModel.mediaButtonRes.observe(viewLifecycleOwner) {
             Glide.with(this)
                 .load(it.second)
@@ -173,6 +180,18 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
                 rotateAnimation.reset()
             }
         }
+        trackViewModel.nowPlayingLiveData.observe(viewLifecycleOwner) {
+            updateTrackStateIfNeed(it)
+        }
+    }
+
+    private fun updateTrackStateIfNeed(metadata: PlayingMetadata) {
+        adapter.setPlayingStatus(
+            Track(
+                metadata.id.toLong(),
+                playingStatus = metadata.isPlaying
+            )
+        )
     }
 
     private fun initPlayingLayoutViews(view: View) {
