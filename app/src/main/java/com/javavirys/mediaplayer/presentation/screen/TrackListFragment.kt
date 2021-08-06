@@ -215,6 +215,13 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
                 model.navigateToTrackScreen(Track(it.id.toLong()))
             }
         }
+        playingLayout.setOnLongClickListener {
+            trackViewModel.mediaMetadata.value?.let {
+                val position = adapter.getItemIndexById(it.id.toLong())
+                trackRecyclerView.smoothScrollToPosition(position)
+            }
+            true
+        }
     }
 
     private fun updatePlayingLayout(metadata: PlayingMetadata) {
