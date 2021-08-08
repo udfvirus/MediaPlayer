@@ -26,7 +26,7 @@ data class Track(
     val id: Long,
     val name: String = "",
     val path: String = "",
-    val artist: String? = null,
+    val artist: String = "",
     var selected: Boolean = false,
     var playingStatus: PlayingStatus = PlayingStatus.STATE_STOP
 ) : Parcelable

@@ -22,7 +22,7 @@ import com.javavirys.mediaplayer.data.database.AppDatabase
 
 object DatabaseFactory {
 
-    private const val DATABASE_NAME = "media-player"
+    private const val DATABASE_NAME = "mediaplayer"
 
     private var appDatabase: AppDatabase? = null
 
@@ -31,7 +31,8 @@ object DatabaseFactory {
             appDatabase = Room.databaseBuilder(
                 applicationContext,
                 AppDatabase::class.java, DATABASE_NAME
-            ).build()
+            ).fallbackToDestructiveMigration()
+                .build()
         }
 
         return appDatabase!!

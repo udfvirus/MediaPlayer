@@ -15,7 +15,7 @@ data class TrackDbo(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     @ColumnInfo(name = COLUMN_FILE_NAME) val filePath: String,
     val name: String,
-    val artist: String? = null,
+    val artist: String,
     val favorite: Boolean = false,
     val bitrate: Int = 0
 ) {
