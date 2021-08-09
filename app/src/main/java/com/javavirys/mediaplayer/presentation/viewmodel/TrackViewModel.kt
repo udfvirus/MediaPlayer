@@ -79,7 +79,7 @@ class TrackViewModel(
                     child.description.subtitle.toString()
                 )
                 Timber.d("recentSubscriptionCallback.onChildrenLoaded.track = $track")
-                if (mediaMetadata.value?.id == child.mediaId) return
+                if (mediaMetadata.value?.id == child.mediaId || mediaMetadata.value?.isPlaying == PlayingStatus.STATE_PLAYING) return
                 mediaMetadata.value = PlayingMetadata(
                     child.mediaId!!,
                     child.description.iconUri,
