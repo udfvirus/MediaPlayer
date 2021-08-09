@@ -90,8 +90,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             }
         } catch (e: Exception) {
             Timber.e(
-                "Cast is not available on this device. " +
-                        "Exception thrown when attempting to obtain CastContext. " + e.message
+                """Cast is not available on this device. Exception thrown when attempting to obtain CastContext. ${e.message}"""
             )
             null
         }
