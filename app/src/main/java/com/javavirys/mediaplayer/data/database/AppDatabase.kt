@@ -22,14 +22,9 @@ import com.javavirys.mediaplayer.data.database.dao.TrackDao
 import com.javavirys.mediaplayer.data.database.entity.TrackDbo
 
 @Database(
-    entities = [
-        TrackDbo::class
-    ],
+    entities = [TrackDbo::class],
     version = 1,
     exportSchema = true
-//    autoMigrations = [
-//        AutoMigration(from = 1, to = 2)
-//    ]
 )
 abstract class AppDatabase : RoomDatabase() {
 

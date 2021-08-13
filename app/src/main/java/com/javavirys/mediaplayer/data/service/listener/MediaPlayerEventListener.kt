@@ -16,7 +16,9 @@
 
 package com.javavirys.mediaplayer.data.service.listener
 
+import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
+import timber.log.Timber
 
 class MediaPlayerEventListener(
     private val onShowNotificationForPlayer: () -> Unit,
@@ -24,6 +26,7 @@ class MediaPlayerEventListener(
     private val onStopForegroundService: (removeNotification: Boolean) -> Unit,
     private val saveRecentSongToStorage: () -> Unit
 ) : Player.EventListener {
+
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         when (playbackState) {
             Player.STATE_BUFFERING,
@@ -38,5 +41,10 @@ class MediaPlayerEventListener(
             }
             else -> onHideNotificationForPlayer()
         }
+    }
+
+    override fun onPlayerError(error: ExoPlaybackException) {
+        error.printStackTrace()
+        Timber.e("onPlayerError.error: $error")
     }
 }

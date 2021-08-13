@@ -19,6 +19,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
+import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -31,6 +32,7 @@ import com.google.android.exoplayer2.ext.cast.CastPlayer
 import com.google.android.exoplayer2.ext.cast.SessionAvailabilityListener
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -51,7 +53,9 @@ import timber.log.Timber
 
 class MediaPlaybackService : MediaBrowserServiceCompat() {
 
-    private lateinit var notificationManager: UampNotificationManager
+    private var mediaSource: ConcatenatingMediaSource? = null
+
+    private lateinit var notificationManager: MediaNotificationManager
 
     private lateinit var currentPlayer: Player
 
@@ -59,7 +63,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
-    private var currentPlaylistItems: List<MediaMetadataCompat> = emptyList()
+    private var currentPlaylistItems: MutableList<MediaMetadataCompat> = mutableListOf()
 
     private val uAmpAudioAttributes = AudioAttributes.Builder()
         .setContentType(C.CONTENT_TYPE_MUSIC)
@@ -89,8 +93,9 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
                 addListener(playerListener)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Timber.e(
-                """Cast is not available on this device. Exception thrown when attempting to obtain CastContext. ${e.message}"""
+                """Cast is not available on this device. Exception thrown when attempting to obtain CastContext. $e"""
             )
             null
         }
@@ -132,7 +137,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
         sessionToken = mediaSession.sessionToken
 
-        notificationManager = UampNotificationManager(
+        notificationManager = MediaNotificationManager(
             this,
             mediaSession.sessionToken,
             PlayerNotificationListener()
@@ -143,14 +148,14 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             mediaStorage.load()
         }
 
-        mediaSessionConnector = MediaSessionConnector(mediaSession)
+        mediaSessionConnector = MediaSessionConnector(mediaSession).also {
+            it.mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)
+        }
         mediaSessionConnector.setPlaybackPreparer(
-            MediaPlaybackPreparer(
-                mediaStorage,
-                ::preparePlaylist
-            )
+            MediaPlaybackPreparer(mediaStorage, ::preparePlaylist)
         )
-        mediaSessionConnector.setQueueNavigator(UampQueueNavigator(mediaSession))
+        mediaSessionConnector.setQueueNavigator(MediaQueueNavigator(mediaSession))
+        mediaSessionConnector.setQueueEditor(QueueEditor())
 
         switchToPlayer(
             previousPlayer = null,
@@ -183,26 +188,26 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     }
 
     private fun preparePlaylist(
-        metadataList: List<MediaMetadataCompat>,
+        metadataList: MutableList<MediaMetadataCompat>,
         itemToPlay: MediaMetadataCompat?,
         playWhenReady: Boolean,
         playbackStartPositionMs: Long
     ) {
+        Timber.d("preparePlaylist().currentPlayer = $currentPlayer")
         val initialWindowIndex = if (itemToPlay == null) 0 else metadataList.indexOf(itemToPlay)
         currentPlaylistItems = metadataList
 
         currentPlayer.playWhenReady = playWhenReady
         currentPlayer.stop(/* reset= */ true)
         if (currentPlayer == exoPlayer) {
+            mediaSource = metadataList.toMediaSource(dataSourceFactory)
 
-            val mediaSource = metadataList.toMediaSource(dataSourceFactory)
-            exoPlayer.prepare(mediaSource)
-
+            exoPlayer.setMediaSource(mediaSource!!)
+            exoPlayer.prepare()
             exoPlayer.seekTo(initialWindowIndex, playbackStartPositionMs)
         } else /* currentPlayer == castPlayer */ {
-            val items: Array<MediaQueueItem> = metadataList.map {
-                it.toMediaQueueItem()
-            }.toTypedArray()
+            val items: Array<MediaQueueItem> = metadataList.map { it.toMediaQueueItem() }
+                .toTypedArray()
             castPlayer!!.loadItems(
                 items,
                 initialWindowIndex,
@@ -306,7 +311,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
-    private inner class UampQueueNavigator(
+    private inner class MediaQueueNavigator(
         mediaSession: MediaSessionCompat
     ) : TimelineQueueNavigator(mediaSession) {
 
@@ -314,8 +319,11 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             player: Player,
             windowIndex: Int
         ): MediaDescriptionCompat {
-            Timber.d("UampQueueNavigator.getMediaDescription.currentPlaylistItems[$windowIndex].description = ${currentPlaylistItems[windowIndex].description}")
-            return currentPlaylistItems[windowIndex].description
+            return if (currentPlaylistItems.size - 1 < windowIndex) {
+                currentPlaylistItems[currentPlaylistItems.size - 1].description
+            } else {
+                currentPlaylistItems[windowIndex].description
+            }
         }
     }
 
@@ -329,6 +337,49 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
             switchToPlayer(currentPlayer, exoPlayer)
         }
     }
+
+
+    private inner class QueueEditor : MediaSessionConnector.QueueEditor {
+        override fun onCommand(
+            player: Player,
+            controlDispatcher: ControlDispatcher,
+            command: String,
+            extras: Bundle?,
+            cb: ResultReceiver?
+        ): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onAddQueueItem(
+            player: Player,
+            description: MediaDescriptionCompat,
+            index: Int
+        ) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onRemoveQueueItem(player: Player, description: MediaDescriptionCompat) {
+            Timber.d("onRemoveQueueItem:  player = $player")
+            Timber.d("onRemoveQueueItem:  description = $description")
+
+            val iterator = currentPlaylistItems.iterator()
+            var index = 0
+            while (iterator.hasNext()) {
+                if (iterator.next().id == description.mediaId) {
+                    mediaSource?.removeMediaSource(index)
+                    iterator.remove()
+                    break
+                }
+                index++
+            }
+        }
+
+    }
+
 
     companion object {
 

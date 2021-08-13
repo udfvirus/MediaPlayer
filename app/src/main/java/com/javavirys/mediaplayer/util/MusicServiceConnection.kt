@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -29,12 +30,14 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
 import com.javavirys.mediaplayer.util.extension.id
+import timber.log.Timber
 
 
 class MusicServiceConnection(context: Context, serviceComponent: ComponentName) {
 
     val isConnected = MutableLiveData<Boolean>()
         .apply { postValue(false) }
+
     val networkFailure = MutableLiveData<Boolean>()
         .apply { postValue(false) }
 
@@ -42,6 +45,7 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
 
     val playbackState = MutableLiveData<PlaybackStateCompat>()
         .apply { postValue(EMPTY_PLAYBACK_STATE) }
+
     val nowPlaying = MutableLiveData<MediaMetadataCompat>()
         .apply { postValue(NOTHING_PLAYING) }
 
@@ -49,11 +53,13 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         get() = mediaController.transportControls
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(context)
+
     private val mediaBrowser = MediaBrowserCompat(
         context,
         serviceComponent,
         mediaBrowserConnectionCallback, null
     ).apply { connect() }
+
     private lateinit var mediaController: MediaControllerCompat
 
     fun subscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {
@@ -82,8 +88,14 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         false
     }
 
-    private inner class MediaBrowserConnectionCallback(private val context: Context) :
-        MediaBrowserCompat.ConnectionCallback() {
+    fun removeItem(description: MediaDescriptionCompat) {
+        mediaController.removeQueueItem(description)
+    }
+
+
+    private inner class MediaBrowserConnectionCallback(
+        private val context: Context
+    ) : MediaBrowserCompat.ConnectionCallback() {
 
         override fun onConnected() {
             mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
@@ -125,6 +137,7 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+            Timber.d("onQueueChanged.queue = $queue")
         }
 
         override fun onSessionEvent(event: String?, extras: Bundle?) {
