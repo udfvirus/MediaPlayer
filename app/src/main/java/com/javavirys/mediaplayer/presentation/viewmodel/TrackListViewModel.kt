@@ -16,6 +16,7 @@
 package com.javavirys.mediaplayer.presentation.viewmodel
 
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaDescriptionCompat
 import androidx.lifecycle.MutableLiveData
 import com.javavirys.mediaplayer.core.entity.Result
 import com.javavirys.mediaplayer.core.entity.Track
@@ -25,6 +26,8 @@ import com.javavirys.mediaplayer.domain.interactor.DeleteTrackInteractor
 import com.javavirys.mediaplayer.presentation.navigation.MainRouter
 import com.javavirys.mediaplayer.util.MusicServiceConnection
 import com.javavirys.mediaplayer.util.PlayerUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class TrackListViewModel(
     private val router: MainRouter,
@@ -129,9 +132,17 @@ class TrackListViewModel(
 
     private fun deleteTracks(list: List<Track>) {
         selectedModeTrackLiveData.value = false
+
         launch(
             backgroundCode = {
                 list.forEach {
+                    withContext(Dispatchers.Main) {
+                        musicServiceConnection.removeItem(
+                            MediaDescriptionCompat.Builder()
+                                .setMediaId(it.id.toString())
+                                .build()
+                        )
+                    }
                     deleteTrackInteractor.execute(it)
                     removeTrackLiveData.postValue(it)
                 }

@@ -30,11 +30,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.javavirys.mediaplayer.R
 import kotlinx.coroutines.*
 
-/**
- * A wrapper class for ExoPlayer's PlayerNotificationManager. It sets up the notification shown to
- * the user during audio playback and provides track metadata, such as track title and icon image.
- */
-class UampNotificationManager(
+class MediaNotificationManager(
     private val context: Context,
     sessionToken: MediaSessionCompat.Token,
     notificationListener: PlayerNotificationManager.NotificationListener

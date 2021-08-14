@@ -33,7 +33,7 @@ import timber.log.Timber
 class MediaPlaybackPreparer(
     private val mediaStorage: MediaStorage,
     private val preparePlaylist: (
-        tracks: List<MediaMetadataCompat>,
+        tracks: MutableList<MediaMetadataCompat>,
         itemToPlay: MediaMetadataCompat,
         playWhenReady: Boolean,
         playbackStartPositionMs: Long
@@ -47,7 +47,9 @@ class MediaPlaybackPreparer(
         extras: Bundle?,
         cb: ResultReceiver?
     ): Boolean {
-        TODO("Not yet implemented")
+        Timber.d("onCommand.command = $command")
+
+        return false
     }
 
     override fun getSupportedPrepareActions(): Long =
@@ -80,7 +82,7 @@ class MediaPlaybackPreparer(
                 C.TIME_UNSET
             ) ?: C.TIME_UNSET
             preparePlaylist(
-                tracks,
+                tracks.toMutableList(),
                 itemToPlay,
                 playWhenReady,
                 playbackStartPositionMs
