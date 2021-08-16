@@ -16,6 +16,12 @@
 
 object Versions {
 
+    const val firebaseBom = "28.3.0"
+
+    const val firebaseCrashlyticsGradle = "2.5.2"
+
+    const val googleService = "4.3.5"
+
     const val gradle = "4.2.2"
 
     const val kotlinGradlePlugin = "1.5.20"
@@ -62,6 +68,21 @@ object Dependencies {
 
     const val navigationSafeArgsGradlePlugin =
         "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
+
+    const val googleServices =
+        "com.google.gms:google-services:${Versions.googleService}"
+
+    const val firebaseCrashlyticsGradle =
+        "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsGradle}"
+
+    const val firebaseAnalytics =
+        "com.google.firebase:firebase-analytics-ktx"
+
+    const val firebaseCrashlytics =
+        "com.google.firebase:firebase-crashlytics-ktx"
+
+    const val firebaseBom =
+        "com.google.firebase:firebase-bom:${Versions.firebaseBom}"
 
     const val coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"
 

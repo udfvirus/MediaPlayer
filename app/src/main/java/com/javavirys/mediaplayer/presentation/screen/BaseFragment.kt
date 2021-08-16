@@ -20,6 +20,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import com.javavirys.mediaplayer.presentation.viewmodel.BaseViewModel
 
 abstract class BaseFragment<M : BaseViewModel> : Fragment {
@@ -35,9 +39,19 @@ abstract class BaseFragment<M : BaseViewModel> : Fragment {
         model.getExceptions().observe(viewLifecycleOwner, ::showException)
     }
 
+    override fun onResume() {
+        super.onResume()
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, getScreenName())
+            param(FirebaseAnalytics.Param.SCREEN_CLASS, this.javaClass.simpleName)
+        }
+    }
+
     protected open fun showException(throwable: Throwable) =
         view?.let {
             Snackbar.make(it, throwable.toString(), Snackbar.LENGTH_LONG)
                 .show()
         }
+
+    protected open fun getScreenName(): String = javaClass.simpleName
 }

@@ -54,10 +54,10 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.getTitleTextView()?.let {
             it.ellipsize = TextUtils.TruncateAt.MARQUEE;
-            it.isFocusableInTouchMode = true;
-            it.requestFocus();
-            it.isSingleLine = true;
-            it.marqueeRepeatLimit = -1;
+            it.isFocusableInTouchMode = true
+            it.requestFocus()
+            it.isSingleLine = true
+            it.marqueeRepeatLimit = -1
         }
         initViews(view)
         initClickListeners()
@@ -114,4 +114,6 @@ class TrackFragment : BaseFragment<TrackViewModel>(R.layout.fragment_track) {
         toolbar.title = metadata.title
         progress.max = metadata.durationMsec.toInt()
     }
+
+    override fun getScreenName() = "TrackScreen"
 }

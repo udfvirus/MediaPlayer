@@ -4,6 +4,8 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-parcelize'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -29,7 +31,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -65,6 +68,10 @@ dependencies {
     // utils
     implementation Dependencies.glide
     kapt Dependencies.glideCompiler
+
+    implementation platform(Dependencies.firebaseBom)
+    implementation Dependencies.firebaseAnalytics
+    implementation Dependencies.firebaseCrashlytics
 
     // Media
     implementation Dependencies.media

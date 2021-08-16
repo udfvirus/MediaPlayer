@@ -52,4 +52,6 @@ class TrackInformationFragment :
         super.onDestroyView()
         model.trackInformationLiveData.removeObservers(viewLifecycleOwner)
     }
+
+    override fun getScreenName() = "TrackInformationScreen"
 }

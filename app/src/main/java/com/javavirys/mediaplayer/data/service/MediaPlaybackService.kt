@@ -232,6 +232,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         parentId: String,
         result: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
+        Timber.d("onLoadChildren parentId = $parentId result = $result")
         when (parentId) {
             ROOT_ID -> sendResultForRootId(result)
             RECENT_ID -> {

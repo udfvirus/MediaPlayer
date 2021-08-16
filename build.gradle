@@ -23,6 +23,8 @@ buildscript {
         classpath Dependencies.gradle
         classpath Dependencies.kotlinGradlePlugin
         classpath Dependencies.navigationSafeArgsGradlePlugin
+        classpath Dependencies.googleServices
+        classpath Dependencies.firebaseCrashlyticsGradle
     }
 }
 
