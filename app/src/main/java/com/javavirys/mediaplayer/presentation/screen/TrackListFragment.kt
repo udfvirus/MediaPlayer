@@ -262,4 +262,6 @@ class TrackListFragment : BaseFragment<TrackListViewModel>(R.layout.fragment_tra
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun getScreenName() = "TrackListScreen"
 }

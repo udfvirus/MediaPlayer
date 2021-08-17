@@ -16,9 +16,32 @@
 
 package com.javavirys.mediaplayer.di
 
+import android.content.Context
 import com.javavirys.mediaplayer.ActivityProvider
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
 val appModule = module {
     single { ActivityProvider(get()) }
+}
+
+fun provideKoinModules(androidContext: Context) {
+    startKoin {
+        androidLogger()
+        androidContext(androidContext)
+        modules(
+            listOf(
+                appModule,
+                mediaModule,
+                databaseModule,
+                repositoryModule,
+                interactorModule,
+                navigationModule,
+                viewModelModule,
+                preferencesModule
+            )
+        )
+    }
 }

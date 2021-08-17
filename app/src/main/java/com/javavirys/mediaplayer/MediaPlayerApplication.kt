@@ -17,10 +17,8 @@
 package com.javavirys.mediaplayer
 
 import android.app.Application
-import com.javavirys.mediaplayer.di.*
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
+import com.javavirys.mediaplayer.di.provideKoinModules
+import com.javavirys.mediaplayer.util.logger.ReleaseTimberTree
 import timber.log.Timber
 
 class MediaPlayerApplication : Application() {
@@ -28,27 +26,14 @@ class MediaPlayerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         setupTimber()
-        startKoin {
-            androidLogger()
-            androidContext(this@MediaPlayerApplication)
-            modules(
-                listOf(
-                    appModule,
-                    mediaModule,
-                    databaseModule,
-                    repositoryModule,
-                    interactorModule,
-                    navigationModule,
-                    viewModelModule,
-                    preferencesModule
-                )
-            )
-        }
+        provideKoinModules(this)
     }
 
     private fun setupTimber() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(ReleaseTimberTree())
         }
     }
 }

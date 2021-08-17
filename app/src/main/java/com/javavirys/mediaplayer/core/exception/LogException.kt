@@ -16,6 +16,6 @@
 
 package com.javavirys.mediaplayer.core.exception
 
-abstract class BaseException @JvmOverloads constructor(
+class LogException @JvmOverloads constructor(
     message: String? = null
-) : RuntimeException(message)
+) : BaseException(message)
