@@ -1,0 +1,26 @@
+name: 'Android application builder'
+on:  push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@master
+
+#  -job:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@master
+#      - name: Publish to Registry
+#        uses: elgohr/Publish-Docker-Github-Action@master
+#        env:
+#          android_compile_sdk: 30
+#          android_build_tools: 30.0.3
+#          android_sdk_tools: 4333796
+#        with:
+#          name: javavirys/android:${{ env.android_build_tools }}
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#          buildargs: android_compile_sdk,android_build_tools,android_sdk_tools
