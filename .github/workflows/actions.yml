@@ -4,6 +4,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     container:
-      image: javavirys/android:30.0.4
+      image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
