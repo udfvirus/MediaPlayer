@@ -7,3 +7,4 @@ jobs:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
+      - run: ls
