@@ -23,8 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - run: ls
-      
       - name: Build apks
         run: ./gradlew build
         env:
@@ -32,7 +30,8 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          
+      - run: ls
+
   buildBundles:
     runs-on: ubuntu-latest
     container:
