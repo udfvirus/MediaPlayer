@@ -16,6 +16,13 @@ jobs:
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint
+          path:
+            app/build/reports
+
   buildApks:
     runs-on: ubuntu-latest
     container:
