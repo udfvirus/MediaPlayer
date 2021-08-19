@@ -30,8 +30,13 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-      - run: ls build
-      - run: ls app/build
+      
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Apks
+          path:
+            app/build/outputs/apk
 
   buildBundles:
     runs-on: ubuntu-latest
