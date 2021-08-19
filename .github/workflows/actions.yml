@@ -31,6 +31,7 @@ jobs:
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       - run: ls build
+      - run: ls app/build
 
   buildBundles:
     runs-on: ubuntu-latest
