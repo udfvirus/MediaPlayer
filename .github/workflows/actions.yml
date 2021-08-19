@@ -30,7 +30,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-      - run: ls
+      - run: ls build
 
   buildBundles:
     runs-on: ubuntu-latest
