@@ -31,7 +31,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
-          STORE_PASSWORD: /../MediaPlayerKeystore.jks
+          STORE_PASSWORD: ../MediaPlayerKeystore.jks
           
   buildBundles:
     runs-on: ubuntu-latest
