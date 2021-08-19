@@ -51,3 +51,11 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Bundles
+          path:
+            app/build/outputs/bundle
+
