@@ -7,5 +7,10 @@ jobs:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
-      - run: ls
-      - run: ./gradlew lint
+      - name: Run lint
+        run: ./gradlew lint
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
