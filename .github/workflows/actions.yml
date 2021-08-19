@@ -14,3 +14,29 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+  buildApks:
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build apks
+        run: ./gradlew build
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+  buildBundles:
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build bundles
+        run: ./gradlew bundle
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
