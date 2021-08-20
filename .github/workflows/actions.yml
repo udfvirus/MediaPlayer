@@ -25,7 +25,7 @@ jobs:
         with:
           path: ~/keystore
           key: ${{ github.sha }}
-
+# Test =================================
   copy_keystore1:
     runs-on: ubuntu-latest
     container:
@@ -43,7 +43,7 @@ jobs:
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       
       # Clone keystore repository
-#       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
+      - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
       - run: mkdir ~/keystore
 #       - run: ls
 #       - run: ls ~
@@ -71,6 +71,8 @@ jobs:
       - run: ls
       - run: ls ~
       - run: ls ~/keystore
+      
+  # Test =================================
       
   tests:
     needs: [ copy_keystore ]
