@@ -27,6 +27,7 @@ jobs:
           key: ${{ github.sha }}
 
   copy_keystore1:
+    needs: [ copy_keystore ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
