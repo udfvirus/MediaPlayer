@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build apks
-        run: ./gradlew build
+        run: ./gradlew assemble
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
