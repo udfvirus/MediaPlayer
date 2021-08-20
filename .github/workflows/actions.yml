@@ -7,6 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - run: env
+      
       # Add private key to ssh agent
       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
       - run: echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
@@ -32,6 +34,8 @@ jobs:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
+      
+      - run: env
       
       - run: apt install -y openssh-client
       - run: apt install -y git
