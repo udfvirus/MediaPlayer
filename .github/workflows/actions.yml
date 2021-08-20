@@ -25,6 +25,7 @@ jobs:
         with:
           path: |
             ~/keystore
+          key: keystore
 
   tests:
     needs: [ copy_keystore ]
