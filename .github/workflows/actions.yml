@@ -7,6 +7,7 @@ jobs:
     steps:
 #       - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
       - run: ls ~
+      - run: git clone git@github.com:javavirys/MediaPlayerKeys.git
 
   tests:
     runs-on: ubuntu-latest
