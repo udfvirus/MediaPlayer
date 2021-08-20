@@ -54,6 +54,7 @@ jobs:
       # Clone keystore repository
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
       - run: mkdir ~/keystore
+      # Copy keystore to keystore directory
       - run: find . -name '*.jks' -exec cp "{}" ~/keystore/  \;
       - run: ls ~/keystore
       - uses: actions/cache@v2
@@ -61,8 +62,6 @@ jobs:
         with:
           path: ~/keystore
           key: ${{ github.sha }}
-      
-  # Test =================================
       
   tests:
     needs: [ copy_keystore ]
@@ -85,9 +84,8 @@ jobs:
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_FILE: ~/keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          KEYSTORE: ${{ secrets.KEYSTORE }}
 
   lint:
     needs: [ copy_keystore ]
