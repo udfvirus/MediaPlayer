@@ -45,14 +45,14 @@ jobs:
       
       # Clone keystore repository
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
-      - run: mkdir ~/keystore
+      - run: mkdir /keystore
       # Copy keystore to keystore directory
-      - run: find . -name '*.jks' -exec cp "{}" ~/keystore/  \;
-      - run: ls ~/keystore
+      - run: find . -name '*.jks' -exec cp "{}" /keystore/  \;
+      - run: ls /keystore
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: ~/keystore
+          path: /keystore
           key: ${{ github.sha }}
       
   tests:
@@ -66,17 +66,17 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: ~/keystore
+          path: /keystore
           key: ${{ github.sha }}
           
-      - run: ls ~/keystore
+      - run: ls /keystore
   
       - name: Run tests
         run: ./gradlew test
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ~/keystore/keystore.jks
+          STORE_FILE: /keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
   lint:
@@ -90,17 +90,17 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: ~/keystore
+          path: /keystore
           key: ${{ github.sha }}
       
-      - run: ls ~/keystore
+      - run: ls /keystore
       
       - name: Run lint
         run: ./gradlew lint
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ~/keystore/keystore.jks
+          STORE_FILE: /keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
@@ -121,17 +121,17 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: ~/keystore
+          path: /keystore
           key: ${{ github.sha }}
 
-      - run: ls ~/keystore
+      - run: ls /keystore
 
       - name: Build apks
         run: ./gradlew assemble
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ~/keystore/keystore.jks
+          STORE_FILE: /keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
@@ -153,17 +153,17 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: ~/keystore
+          path: /keystore
           key: ${{ github.sha }}
           
-      - run: ls ~/keystore
+      - run: ls /keystore
       
       - name: Build bundles
         run: ./gradlew bundle
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ~/keystore/keystore.jks
+          STORE_FILE: /keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
