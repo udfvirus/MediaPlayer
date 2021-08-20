@@ -5,7 +5,7 @@ jobs:
   copy_keystore:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
+#       - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
       - run: ls ~
 
   tests:
