@@ -2,6 +2,12 @@ name: 'Android application builder'
 on: push
 jobs:
 
+  copy_keystore:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ secrets.KEYSTORE }} > keystore.jks
+      - run: ls ~
+
   tests:
     runs-on: ubuntu-latest
     container:
@@ -15,6 +21,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
 
   lint:
     runs-on: ubuntu-latest
