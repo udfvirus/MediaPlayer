@@ -5,8 +5,16 @@ jobs:
   copy_keystore:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
 #       - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
 #       - run: ls ~
+      
+      # Add private key to ssh agent
+      - run: mkdir ~/.ssh; chmod 700 ~/.ssh
+      - run: echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+      - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
 
   tests:
