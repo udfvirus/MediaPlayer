@@ -42,6 +42,7 @@ jobs:
           
       - run: ls ~
       - run: ls
+      - run: ls /
       - name: Run tests
         run: ./gradlew test
         env:
