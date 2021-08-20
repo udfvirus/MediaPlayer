@@ -23,8 +23,7 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: |
-            ~/keystore
+          path: ~/keystore
           key: ${{ github.sha }}
 
   tests:
@@ -38,11 +37,11 @@ jobs:
       - uses: actions/cache@v2
         id: restore-build
         with:
-          path: |
-            ~/keystore
+          path: ~/keystore
           key: ${{ github.sha }}
           
       - run: ls ~
+      - run: ls
       - name: Run tests
         run: ./gradlew test
         env:
