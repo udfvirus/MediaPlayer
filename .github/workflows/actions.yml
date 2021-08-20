@@ -1,0 +1,184 @@
+name: 'Android application builder'
+on: push
+jobs:
+
+#   copy_keystore:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+      
+#       - run: env
+      
+#       # Add private key to ssh agent
+#       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
+#       - run: echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+#       - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
+#       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      
+#       # Clone keystore repository
+#       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
+#       - run: mkdir ~/keystore
+#       - run: ls
+#       - run: ls ~
+#       - run: find . -name '*.jks' -exec cp "{}" ~/keystore/  \;
+#       - run: ls ~/keystore
+#       - uses: actions/cache@v2
+#         id: restore-build
+#         with:
+#           path: ~/keystore
+#           key: ${{ github.sha }}
+# Test =================================
+  copy_keystore:
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      
+      - run: apt install -y git
+      
+      # Add private key to ssh agent
+      - run: mkdir /root/.ssh; chmod 700 /root/.ssh
+      - run: echo "${{ secrets.PRIVATE_KEY }}" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
+      - run: eval "$(ssh-agent -s)" && ssh-add /root/.ssh/id_rsa
+      - run: ssh-keyscan github.com >> /root/.ssh/known_hosts
+      
+      # Clone keystore repository
+      - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
+      - run: mkdir /keystore
+      # Copy keystore to keystore directory
+      - run: find . -name '*.jks' -exec cp "{}" /keystore/  \;
+      - run: ls /keystore
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: /keystore
+          key: ${{ github.sha }}
+      
+  tests:
+    needs: [ copy_keystore ]
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: /keystore
+          key: ${{ github.sha }}
+          
+      - run: ls /keystore
+  
+      - name: Run tests
+        run: ./gradlew test
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: /keystore/keystore.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+  lint:
+    needs: [ copy_keystore ]
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: /keystore
+          key: ${{ github.sha }}
+      
+      - run: ls /keystore
+      
+      - name: Run lint
+        run: ./gradlew lint
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: /keystore/keystore.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint
+          path:
+            app/build/reports
+
+  buildApks:
+    needs: [ lint, tests ]
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: /keystore
+          key: ${{ github.sha }}
+
+      - run: ls /keystore
+
+      - name: Build apks
+        run: ./gradlew assemble
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: /keystore/keystore.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Apks
+          path:
+            app/build/outputs/apk
+
+  buildBundles:
+    needs: [ lint, tests ]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: /keystore
+          key: ${{ github.sha }}
+          
+      - run: ls /keystore
+      
+      - name: Build bundles
+        run: ./gradlew bundle
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: /keystore/keystore.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Bundles
+          path:
+            app/build/outputs/bundle
+
+  publishToPlay:
+    needs: [ buildBundles ]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo Not Implemented yet!

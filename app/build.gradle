@@ -1,3 +1,5 @@
+import gradleutils.Keystore
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -7,6 +9,8 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
 }
+
+def keystore = new Keystore(rootProject)
 
 android {
     compileSdkVersion 30
@@ -29,8 +33,18 @@ android {
 
     }
 
+    signingConfigs {
+        release {
+            keyAlias keystore.getProperty('KEY_ALIAS')
+            keyPassword keystore.getProperty('KEY_PASSWORD')
+            storeFile file(keystore.getProperty('STORE_FILE'))
+            storePassword keystore.getProperty('STORE_PASSWORD')
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
