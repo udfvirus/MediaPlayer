@@ -94,12 +94,19 @@ jobs:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: ~/keystore
+          key: ${{ github.sha }}
+      
       - name: Run lint
         run: ./gradlew lint
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_FILE: ~/keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
@@ -117,12 +124,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: ~/keystore
+          key: ${{ github.sha }}
+
       - name: Build apks
         run: ./gradlew assemble
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_FILE: ~/keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
@@ -140,12 +153,19 @@ jobs:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: ~/keystore
+          key: ${{ github.sha }}
+      
       - name: Build bundles
         run: ./gradlew bundle
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_FILE: ~/keystore/keystore.jks
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Archive artifacts
