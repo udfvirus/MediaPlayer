@@ -15,8 +15,9 @@ jobs:
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
-      - run: ls
-      - run: find "$(pwd)" -name *.jks
+      - run: mkdir ~/keystore
+      - run: ls ~
+#       - run: find . -name '*.md' -exec cp "{}" /home/javavirys  \;
 
   tests:
     runs-on: ubuntu-latest
