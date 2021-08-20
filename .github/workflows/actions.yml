@@ -44,7 +44,7 @@ jobs:
       
       # Add private key to ssh agent
       - run: mkdir /root/.ssh; chmod 700 /root/.ssh
-      - run: echo "${{ secrets.PRIVATE_KEY }}" > /root/.ssh/id_rsa && chmod 600 root/.ssh/id_rsa
+      - run: echo "${{ secrets.PRIVATE_KEY }}" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
       - run: eval "$(ssh-agent -s)" && ssh-add /root/.ssh/id_rsa
       - run: ssh-keyscan github.com >> /root/.ssh/known_hosts
       
