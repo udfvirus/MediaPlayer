@@ -6,7 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-#       - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
       
       # Add private key to ssh agent
       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
@@ -14,18 +13,26 @@ jobs:
       - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       
+      # Clone keystore repository
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
       - run: mkdir ~/keystore
       - run: ls
       - run: ls ~
       - run: find . -name '*.jks' -exec cp "{}" ~/keystore/  \;
       - run: ls ~/keystore
+      - name: Keystore caching
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/keystore
 
   tests:
+    needs: [ copy_keystore ]
     runs-on: ubuntu-latest
     container:
       image: javavirys/android:30.0.3
     steps:
+      - run: ls ~
       - uses: actions/checkout@v2
       - name: Run tests
         run: ./gradlew test
@@ -37,6 +44,7 @@ jobs:
           KEYSTORE: ${{ secrets.KEYSTORE }}
 
   lint:
+    needs: [ copy_keystore ]
     runs-on: ubuntu-latest
     container:
       image: javavirys/android:30.0.3
