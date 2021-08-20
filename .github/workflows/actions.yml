@@ -16,8 +16,10 @@ jobs:
       
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
       - run: mkdir ~/keystore
+      - run: ls
       - run: ls ~
-#       - run: find . -name '*.md' -exec cp "{}" /home/javavirys  \;
+      - run: find . -name '*.jks' -exec cp "{}" ~/keystore/  \;
+      - run: ls ~/keystore
 
   tests:
     runs-on: ubuntu-latest
