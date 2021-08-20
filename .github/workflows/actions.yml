@@ -1,8 +1,22 @@
 name: 'Android application builder'
-on:  push
+on: push
 jobs:
 
-  check:
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: ./gradlew test
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_FILE: ${{ secrets.STORE_FILE }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+  lint:
     runs-on: ubuntu-latest
     container:
       image: javavirys/android:30.0.3
@@ -15,7 +29,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          
+
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -24,12 +38,13 @@ jobs:
             app/build/reports
 
   buildApks:
+    needs: [ lint, tests ]
     runs-on: ubuntu-latest
     container:
       image: javavirys/android:30.0.3
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Build apks
         run: ./gradlew build
         env:
@@ -37,7 +52,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-      
+
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -46,6 +61,8 @@ jobs:
             app/build/outputs/apk
 
   buildBundles:
+    needs: [ lint, tests ]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     container:
       image: javavirys/android:30.0.3
@@ -58,7 +75,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_FILE: ${{ secrets.STORE_FILE }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          
+
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -66,3 +83,12 @@ jobs:
           path:
             app/build/outputs/bundle
 
+  publishToPlay:
+    needs: [ buildBundles ]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container:
+      image: javavirys/android:30.0.3
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo Not Implemented yet!
