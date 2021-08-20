@@ -7,7 +7,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 #       - run: echo "${{ secrets.KEYSTORE }}" > keystore.jks
-#       - run: ls ~
       
       # Add private key to ssh agent
       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
