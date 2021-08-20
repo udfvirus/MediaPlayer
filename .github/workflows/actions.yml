@@ -43,13 +43,13 @@ jobs:
       - run: apt install -y git
       
       # Add private key to ssh agent
-      - run: mkdir ~/.ssh; chmod 700 ~/.ssh
-      - run: echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
-      - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
-      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run: mkdir /root/.ssh; chmod 700 /root/.ssh
+      - run: echo "${{ secrets.PRIVATE_KEY }}" > /root/.ssh/id_rsa && chmod 600 root/.ssh/id_rsa
+      - run: eval "$(ssh-agent -s)" && ssh-add /root/.ssh/id_rsa
+      - run: ssh-keyscan github.com >> root/.ssh/known_hosts
       
       - run: echo ~
-      - run: ls -a ~/.ssh
+      - run: ls -a /root/.ssh
       
       # Clone keystore repository
       - run: git clone git@github.com:javavirys/MediaPlayerKeystore.git
