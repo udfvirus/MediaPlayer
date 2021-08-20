@@ -10,6 +10,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - run: apt install -y openssh-client 
+      - run: apt install -y git
       
       # Add private key to ssh agent
       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
