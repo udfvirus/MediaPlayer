@@ -44,7 +44,6 @@ jobs:
       - run: mkdir ~/.ssh; chmod 700 ~/.ssh
       - run: echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
-      - run: ssh-keygen -R github.com
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       
       
