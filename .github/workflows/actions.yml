@@ -37,7 +37,7 @@ jobs:
       
       - run: env
       
-      - run: ls ~ -a
+      - run: ls / -a
       
 #       - run: apt install -y openssh-client
       - run: apt install -y git
